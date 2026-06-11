@@ -10,6 +10,8 @@ export type ProviderListItem = {
   city: string;
   locality: string;
   pincode: string;
+  lat?: number | null;
+  lng?: number | null;
   gender?: string | null;
   experienceYears: number;
   expectedSalary?: number | null;
@@ -19,6 +21,7 @@ export type ProviderListItem = {
   emailVerified: boolean;
   ratingAvg: number;
   ratingCount: number;
+  distanceKm?: number | null;
 };
 
 function initials(name: string) {
@@ -64,8 +67,13 @@ export default function ProviderCard({ p }: { p: ProviderListItem }) {
               </span>
             )}
           </div>
-          <p className="mt-0.5 flex items-center gap-1 text-sm text-slate-500">
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-1 text-sm text-slate-500">
             <MapPin size={13} /> {p.locality}, {p.city} · {p.pincode}
+            {typeof p.distanceKm === "number" && (
+              <span className="ml-1 rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">
+                {p.distanceKm < 1 ? `${Math.round(p.distanceKm * 1000)} m` : `${p.distanceKm.toFixed(1)} km`} away
+              </span>
+            )}
           </p>
           {p.ratingCount > 0 && (
             <div className="mt-1">

@@ -51,6 +51,8 @@ model ProviderProfile {
   city               String
   locality           String
   pincode            String
+  lat                Float? // set when the helper pins their location
+  lng                Float?
   gender             String?
   experienceYears    Int                @default(0)
   expectedSalary     Int? // monthly, INR

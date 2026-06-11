@@ -41,6 +41,8 @@ export async function GET() {
           city: p.city,
           locality: p.locality,
           pincode: p.pincode,
+          lat: p.lat,
+          lng: p.lng,
           gender: p.gender,
           experienceYears: p.experienceYears,
           expectedSalary: p.expectedSalary,

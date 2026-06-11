@@ -8,6 +8,7 @@ import EmailMethodCard from "./EmailMethodCard";
 import ProfileStatusToggle from "./ProfileStatusToggle";
 import ProfilePhotoCard from "./ProfilePhotoCard";
 import ProviderRequests from "./ProviderRequests";
+import LocationPicker from "./LocationPicker";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -29,6 +30,8 @@ type Profile = {
     expectedSalary: number | null;
     bio: string | null;
     available: boolean;
+    lat: number | null;
+    lng: number | null;
     verified: boolean;
     verificationStatus: Status;
     verificationNote: string | null;
@@ -261,6 +264,7 @@ export default function DashboardForm() {
             <div>
               <h1 className="text-xl font-bold text-slate-900">Edit profile</h1>
               {p && <ProfilePhotoCard initialPhoto={p.photoUrl} name={data.name} />}
+              {p && <LocationPicker initialLat={p.lat} initialLng={p.lng} />}
 
               <form onSubmit={save} className="card mt-5 space-y-4 p-6">
                 <div className="grid gap-4 sm:grid-cols-2">
