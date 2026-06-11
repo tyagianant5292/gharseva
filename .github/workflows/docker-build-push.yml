@@ -1,7 +1,8 @@
 name: Build & Push Docker Image
 
 # Builds the GharSeva container and pushes it to Docker Hub.
-# Requires repo secrets DOCKERHUB_USERNAME + DOCKERHUB_TOKEN (now set).
+# Secrets DOCKERHUB_USERNAME + DOCKERHUB_TOKEN live in the "Production"
+# environment, so the job declares `environment: Production` to read them.
 
 on:
   push:
@@ -21,6 +22,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Production
     permissions:
       contents: read
     steps:
