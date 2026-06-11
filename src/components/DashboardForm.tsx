@@ -116,24 +116,42 @@ export default function DashboardForm() {
         Keep your details up to date so families nearby can find you.
       </p>
 
+      {/* Account-created / status banner */}
+      {p && (
+        <div
+          className={`mt-5 rounded-xl p-4 ring-1 ${
+            p.verified ? "bg-teal-50 ring-teal-200" : "bg-brand-50 ring-brand-200"
+          }`}
+        >
+          {p.verified ? (
+            <p className="flex items-center gap-2 font-semibold text-teal-800">
+              <BadgeCheck size={18} /> Your account is verified — families can see your Verified badge.
+            </p>
+          ) : (
+            <>
+              <p className="text-base font-semibold text-brand-800">
+                🎉 Welcome, {data.name}! Your account has been created.
+              </p>
+              <p className="mt-0.5 text-sm text-brand-700">
+                Verify your account to earn the <span className="font-semibold">Verified badge</span> and win
+                families&apos; trust — use either method below.
+              </p>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Verification — two ways: email and/or documents */}
       {p && (
         <div className="mt-5">
           <h2 className="text-sm font-semibold text-slate-700">
             Get verified <span className="font-normal text-slate-400">— do either or both</span>
           </h2>
-          <p className="text-xs text-slate-400">
-            The <span className="font-medium">document</span> check (admin-approved) gives you the trusted
-            Verified badge. Email confirmation is an extra trust signal.
+          <p className="mt-0.5 text-xs text-slate-400">
+            Email confirmation is a light trust signal; the admin document check gives the trusted Verified badge.
           </p>
-          <div className="mt-3 grid gap-4 lg:grid-cols-2">
+          <div className="mt-3">
             <EmailMethodCard email={data.email} emailVerified={data.emailVerified} />
-            <div className="card p-4">
-              <p className="text-sm font-semibold text-slate-800">Document verification</p>
-              <p className="mt-1 text-xs text-slate-400">
-                Upload your ID — an admin approves it and you get the Verified badge. See below.
-              </p>
-            </div>
           </div>
           <VerificationSection
             initialStatus={p.verificationStatus}

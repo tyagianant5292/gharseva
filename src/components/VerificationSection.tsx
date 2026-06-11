@@ -98,10 +98,10 @@ export default function VerificationSection({
     PENDING: {
       cls: "bg-amber-50 text-amber-800 ring-amber-200",
       icon: <Clock size={18} />,
-      title: hasIdDoc ? "Verification under review" : "Get verified",
+      title: hasIdDoc ? "Documents under review" : "Document verification",
       text: hasIdDoc
         ? "We've received your documents. An admin will review them shortly."
-        : "Upload an ID document to get a Verified badge and win more trust.",
+        : "Upload an ID document — an admin approves it and you get the Verified badge.",
     },
     REJECTED: {
       cls: "bg-red-50 text-red-800 ring-red-200",
