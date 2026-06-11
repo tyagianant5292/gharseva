@@ -14,12 +14,28 @@ export async function GET() {
   });
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  // Profile-view stats (leads = logged-in people who unlocked this provider's contact).
+  let views = 0;
+  let recentLeads: { name: string; at: string }[] = [];
+  if (user.provider) {
+    views = await prisma.contactView.count({ where: { providerId: user.provider.id } });
+    const leads = await prisma.contactView.findMany({
+      where: { providerId: user.provider.id },
+      take: 8,
+      orderBy: { createdAt: "desc" },
+      include: { viewer: { select: { name: true } } },
+    });
+    recentLeads = leads.map((l) => ({ name: l.viewer.name, at: l.createdAt.toISOString() }));
+  }
+
   return NextResponse.json({
     name: user.name,
     email: user.email,
     mobile: user.mobile,
     role: user.role,
     provider: user.provider,
+    views,
+    recentLeads,
   });
 }
 

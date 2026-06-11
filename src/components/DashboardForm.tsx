@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BadgeCheck, Save } from "lucide-react";
+import { BadgeCheck, Save, Eye, Users } from "lucide-react";
 import { SERVICES } from "@/lib/services";
+
+type Lead = { name: string; at: string };
 
 type Profile = {
   name: string;
   email: string;
   mobile: string;
+  views: number;
+  recentLeads: Lead[];
   provider: {
     services: string[];
     city: string;
@@ -21,6 +25,17 @@ type Profile = {
     verified: boolean;
   } | null;
 };
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
 
 export default function DashboardForm() {
   const [data, setData] = useState<Profile | null>(null);
@@ -91,6 +106,38 @@ export default function DashboardForm() {
       <p className="mt-1 text-sm text-slate-500">
         Keep your details up to date so families nearby can find you.
       </p>
+
+      {/* Profile views / leads */}
+      <div className="mt-5 grid gap-4 sm:grid-cols-[auto_1fr]">
+        <div className="card flex items-center gap-4 p-5">
+          <div className="grid h-12 w-12 place-items-center rounded-xl bg-brand-100 text-brand-700">
+            <Eye size={22} />
+          </div>
+          <div>
+            <div className="text-2xl font-extrabold text-slate-900">{data.views}</div>
+            <div className="text-sm text-slate-500">profile {data.views === 1 ? "view" : "views"}</div>
+          </div>
+        </div>
+        <div className="card p-5">
+          <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+            <Users size={15} /> Recent interest
+          </h2>
+          {data.recentLeads.length === 0 ? (
+            <p className="mt-2 text-sm text-slate-400">
+              No one has unlocked your contact yet. Keep your profile complete to get noticed.
+            </p>
+          ) : (
+            <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              {data.recentLeads.map((l, i) => (
+                <li key={i} className="text-sm text-slate-600">
+                  <span className="font-medium text-slate-800">{l.name}</span>{" "}
+                  <span className="text-slate-400">· {timeAgo(l.at)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
 
       <form onSubmit={save} className="card mt-5 space-y-4 p-6">
         <div className="grid gap-4 sm:grid-cols-2">
