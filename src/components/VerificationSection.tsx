@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { BadgeCheck, ShieldAlert, Clock, Upload, ShieldCheck, FileText, Camera } from "lucide-react";
-import { fileToUploadData, type UploadKind } from "@/lib/image";
+import { fileToUploadData, fileToResizedDataUrl, type UploadKind } from "@/lib/image";
 
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
 type Pick = { dataUrl: string; kind: UploadKind } | null;
@@ -39,6 +39,7 @@ export default function VerificationSection({
   const [front, setFront] = useState<Pick>(null);
   const [back, setBack] = useState<Pick>(null);
   const [photo, setPhoto] = useState<Pick>(photoUrl ? { dataUrl: photoUrl, kind: "image" } : null);
+  const [photoThumb, setPhotoThumb] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [hasDoc, setHasDoc] = useState(hasIdDoc);
@@ -54,6 +55,25 @@ export default function VerificationSection({
         return;
       }
       set(r);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not read file");
+    }
+  }
+
+  async function pickPhoto(file: File | undefined) {
+    if (!file) return;
+    setError("");
+    try {
+      if (file.type === "application/pdf") {
+        setError("Profile photo must be an image, not a PDF.");
+        return;
+      }
+      const [full, thumb] = await Promise.all([
+        fileToResizedDataUrl(file, 700, 0.72),
+        fileToResizedDataUrl(file, 96, 0.6),
+      ]);
+      setPhoto({ dataUrl: full, kind: "image" });
+      setPhotoThumb(thumb);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not read file");
     }
@@ -76,6 +96,7 @@ export default function VerificationSection({
           idDocUrl: front.dataUrl,
           idDocBackUrl: back?.dataUrl,
           photoUrl: photo?.kind === "image" && photo.dataUrl.startsWith("data:") ? photo.dataUrl : undefined,
+          photoThumbUrl: photoThumb || undefined,
         }),
       });
       const d = await res.json();
@@ -179,7 +200,7 @@ export default function VerificationSection({
               type="file"
               accept="image/*"
               capture="user"
-              onChange={(e) => pick(e.target.files?.[0], setPhoto, "photo")}
+              onChange={(e) => pickPhoto(e.target.files?.[0])}
               className={fileInputCls}
             />
           </div>

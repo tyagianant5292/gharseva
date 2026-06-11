@@ -33,6 +33,7 @@ model User {
   createdAt        DateTime         @default(now())
   provider         ProviderProfile?
   contactViews     ContactView[]    @relation("ViewerContacts")
+  reviews          Review[]         @relation("AuthoredReviews")
 }
 
 model ProviderProfile {
@@ -48,6 +49,9 @@ model ProviderProfile {
   expectedSalary     Int? // monthly, INR
   bio                String?
   photoUrl           String? // profile photo (data URL for MVP)
+  photoThumbUrl      String? // tiny thumbnail for list cards
+  ratingCount        Int                @default(0)
+  ratingAvg          Float              @default(0)
   idDocUrl           String? // uploaded ID proof — front (data URL: image or PDF, admin-only)
   idDocBackUrl       String? // ID proof — back side (Aadhaar etc.)
   idDocType          String? // e.g. Aadhaar / PAN / Driving License
@@ -58,10 +62,26 @@ model ProviderProfile {
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
   contactViews       ContactView[]
+  reviews            Review[]
 
   @@index([city])
   @@index([pincode])
   @@index([verified])
+}
+
+model Review {
+  id         String          @id @default(cuid())
+  providerId String
+  provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User            @relation("AuthoredReviews", fields: [authorId], references: [id], onDelete: Cascade)
+  rating     Int // 1..5
+  comment    String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([authorId, providerId])
+  @@index([providerId])
 }
 
 // Records when a logged-in customer reveals a provider's contact (gating + leads).

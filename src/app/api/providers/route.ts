@@ -34,8 +34,10 @@ export async function GET(req: Request) {
       experienceYears: true,
       expectedSalary: true,
       bio: true,
-      photoUrl: true,
+      photoThumbUrl: true,
       verified: true,
+      ratingAvg: true,
+      ratingCount: true,
       user: { select: { name: true, emailVerified: true } },
     },
   });
@@ -51,9 +53,11 @@ export async function GET(req: Request) {
     experienceYears: p.experienceYears,
     expectedSalary: p.expectedSalary,
     bio: p.bio,
-    photoUrl: p.photoUrl,
+    photoThumbUrl: p.photoThumbUrl,
     verified: p.verified,
     emailVerified: p.user.emailVerified,
+    ratingAvg: p.ratingAvg,
+    ratingCount: p.ratingCount,
   }));
 
   return NextResponse.json({ providers: result, count: result.length });

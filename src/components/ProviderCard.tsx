@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BadgeCheck, MapPin, Briefcase, Mail } from "lucide-react";
 import { serviceLabel, serviceIcon } from "@/lib/services";
+import Stars from "./Stars";
 
 export type ProviderListItem = {
   id: string;
@@ -13,9 +14,11 @@ export type ProviderListItem = {
   experienceYears: number;
   expectedSalary?: number | null;
   bio?: string | null;
-  photoUrl?: string | null;
+  photoThumbUrl?: string | null;
   verified: boolean;
   emailVerified: boolean;
+  ratingAvg: number;
+  ratingCount: number;
 };
 
 function initials(name: string) {
@@ -32,9 +35,18 @@ export default function ProviderCard({ p }: { p: ProviderListItem }) {
   return (
     <Link href={`/providers/${p.id}`} className="card animate-fade-up block p-4 transition-shadow hover:shadow-md">
       <div className="flex items-start gap-3">
-        <div className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-full bg-brand-100 text-base font-bold text-brand-700">
-          {initials(p.name)}
-        </div>
+        {p.photoThumbUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={p.photoThumbUrl}
+            alt={p.name}
+            className="h-12 w-12 flex-shrink-0 rounded-full object-cover ring-1 ring-slate-200"
+          />
+        ) : (
+          <div className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-full bg-brand-100 text-base font-bold text-brand-700">
+            {initials(p.name)}
+          </div>
+        )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <h3 className="truncate font-semibold text-slate-900">{p.name}</h3>
@@ -55,6 +67,11 @@ export default function ProviderCard({ p }: { p: ProviderListItem }) {
           <p className="mt-0.5 flex items-center gap-1 text-sm text-slate-500">
             <MapPin size={13} /> {p.locality}, {p.city} · {p.pincode}
           </p>
+          {p.ratingCount > 0 && (
+            <div className="mt-1">
+              <Stars avg={p.ratingAvg} count={p.ratingCount} size={13} />
+            </div>
+          )}
         </div>
       </div>
 

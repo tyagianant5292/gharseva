@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { BadgeCheck, MapPin, Briefcase, Phone, Mail, Lock, ArrowLeft } from "lucide-react";
 import { serviceLabel, serviceIcon } from "@/lib/services";
+import Stars from "@/components/Stars";
+import ReviewsSection, { type Review } from "@/components/ReviewsSection";
 
 type Detail = {
   id: string;
@@ -21,6 +23,8 @@ type Detail = {
   verified: boolean;
   emailVerified: boolean;
   available: boolean;
+  ratingAvg: number;
+  ratingCount: number;
   contact: { mobile: string; email: string | null } | null;
 };
 
@@ -28,25 +32,29 @@ export default function ProviderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [p, setP] = useState<Detail | null>(null);
   const [canSee, setCanSee] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+  const [myReview, setMyReview] = useState<{ rating: number; comment: string | null } | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch(`/api/providers/${id}`);
-        if (res.status === 404) {
-          setNotFound(true);
-          return;
-        }
-        const data = await res.json();
-        setP(data.provider);
-        setCanSee(data.canSeeContact);
-      } finally {
-        setLoading(false);
-      }
-    })();
+  const load = useCallback(async () => {
+    const res = await fetch(`/api/providers/${id}`);
+    if (res.status === 404) {
+      setNotFound(true);
+      return;
+    }
+    const data = await res.json();
+    setP(data.provider);
+    setCanSee(data.canSeeContact);
+    setCanReview(data.canReview);
+    setMyReview(data.myReview);
+    setReviews(data.reviews || []);
   }, [id]);
+
+  useEffect(() => {
+    load().finally(() => setLoading(false));
+  }, [load]);
 
   if (loading) return <div className="container-x py-12 text-slate-500">Loading…</div>;
   if (notFound || !p)
@@ -101,6 +109,11 @@ export default function ProviderDetailPage() {
               {p.gender ? ` · ${p.gender}` : ""}
               {p.available ? " · Available" : " · Not available"}
             </p>
+            {p.ratingCount > 0 && (
+              <div className="mt-1.5">
+                <Stars avg={p.ratingAvg} count={p.ratingCount} size={15} />
+              </div>
+            )}
           </div>
         </div>
 
@@ -166,6 +179,17 @@ export default function ProviderDetailPage() {
           )}
         </div>
       </div>
+
+      <ReviewsSection
+        providerId={p.id}
+        ratingAvg={p.ratingAvg}
+        ratingCount={p.ratingCount}
+        reviews={reviews}
+        canReview={canReview}
+        myReview={myReview}
+        loggedIn={canSee}
+        onChange={load}
+      />
     </div>
   );
 }

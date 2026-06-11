@@ -1,12 +1,17 @@
 name: Build & Push Docker Image
 
 # Builds the GharSeva container and pushes it to Docker Hub.
-# MANUAL ONLY: GharSeva deploys on Vercel, so the Docker image isn't needed for
-# normal operation. To enable it, add repo secrets DOCKERHUB_USERNAME +
-# DOCKERHUB_TOKEN, then run this workflow from the Actions tab (or re-add a
-# `push:` trigger). Left as workflow_dispatch so pushes don't fail without secrets.
+# Requires repo secrets DOCKERHUB_USERNAME + DOCKERHUB_TOKEN (now set).
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "prisma/**"
+      - "package.json"
+      - "Dockerfile"
+      - ".github/workflows/docker-build-push.yml"
   workflow_dispatch: {}
 
 env:

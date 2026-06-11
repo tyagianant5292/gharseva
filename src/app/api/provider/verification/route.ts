@@ -22,6 +22,7 @@ const schema = z.object({
   idDocUrl: docUrl,
   idDocBackUrl: docUrl.optional(),
   photoUrl: imageUrl.optional(),
+  photoThumbUrl: imageUrl.optional(),
 });
 
 export async function POST(req: Request) {
@@ -52,7 +53,7 @@ export async function POST(req: Request) {
       idDocType: d.idDocType,
       idDocUrl: d.idDocUrl,
       idDocBackUrl: d.idDocBackUrl ?? null,
-      ...(d.photoUrl ? { photoUrl: d.photoUrl } : {}),
+      ...(d.photoUrl ? { photoUrl: d.photoUrl, photoThumbUrl: d.photoThumbUrl ?? d.photoUrl } : {}),
       // Submitting (or re-submitting) puts the provider back in the review queue.
       verified: false,
       verificationStatus: "PENDING",
