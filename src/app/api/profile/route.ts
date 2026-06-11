@@ -62,7 +62,9 @@ export async function GET() {
 export async function PUT(req: Request) {
   const session = await getSessionUser();
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  if (session.role !== "PROVIDER")
+
+  const existing = await prisma.providerProfile.findUnique({ where: { userId: session.id } });
+  if (!existing)
     return NextResponse.json({ error: "Only providers have a profile" }, { status: 403 });
 
   const body = await req.json().catch(() => null);

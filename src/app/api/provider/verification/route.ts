@@ -18,8 +18,14 @@ const schema = z.object({
 export async function POST(req: Request) {
   const session = await getSessionUser();
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  if (session.role !== "PROVIDER")
-    return NextResponse.json({ error: "Only providers can submit verification" }, { status: 403 });
+
+  // Source of truth is the DB profile, not the (possibly stale) JWT role claim.
+  const existing = await prisma.providerProfile.findUnique({ where: { userId: session.id } });
+  if (!existing)
+    return NextResponse.json(
+      { error: "Only providers can submit verification. Please register as a helper." },
+      { status: 403 },
+    );
 
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);
