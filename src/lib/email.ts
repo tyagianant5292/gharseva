@@ -63,6 +63,31 @@ export async function sendVerificationEmail(to: string, name: string, token: str
   return send(to, name, "Verify your GharSeva email", html);
 }
 
+export async function sendVerificationResultEmail(
+  to: string,
+  name: string,
+  approved: boolean,
+  note?: string | null,
+): Promise<boolean> {
+  const subject = approved
+    ? "Your GharSeva profile is verified ✅"
+    : "Your GharSeva verification needs attention";
+  const html = approved
+    ? `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto">
+        <h2 style="color:#0d9488">You're verified, ${escapeHtml(name)}! ✅</h2>
+        <p>Your documents were approved. Your profile now shows the <b>Verified</b> badge, so families can trust and contact you with confidence.</p>
+        <p style="margin:20px 0"><a href="${SITE_URL}/dashboard" style="background:#ea580c;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Open my profile</a></p>
+      </div>`
+    : `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto">
+        <h2 style="color:#dc2626">Verification not approved</h2>
+        <p>Hi ${escapeHtml(name)}, we couldn't approve your documents this time.</p>
+        ${note ? `<p style="background:#fef2f2;padding:10px 14px;border-radius:8px;color:#991b1b">Reason: ${escapeHtml(note)}</p>` : ""}
+        <p>Please re-upload a clear ID from your dashboard.</p>
+        <p style="margin:20px 0"><a href="${SITE_URL}/dashboard" style="background:#ea580c;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Re-upload documents</a></p>
+      </div>`;
+  return send(to, name, subject, html);
+}
+
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string,

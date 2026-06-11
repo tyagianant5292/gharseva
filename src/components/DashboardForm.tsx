@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BadgeCheck, Save, Eye, Users } from "lucide-react";
+import { BadgeCheck, Save, Eye, Users, ShieldAlert, Clock } from "lucide-react";
 import { SERVICES } from "@/lib/services";
 import VerificationSection from "./VerificationSection";
 import EmailMethodCard from "./EmailMethodCard";
@@ -116,30 +116,42 @@ export default function DashboardForm() {
         Keep your details up to date so families nearby can find you.
       </p>
 
-      {/* Account-created / status banner */}
-      {p && (
-        <div
-          className={`mt-5 rounded-xl p-4 ring-1 ${
-            p.verified ? "bg-teal-50 ring-teal-200" : "bg-brand-50 ring-brand-200"
-          }`}
-        >
-          {p.verified ? (
+      {/* Account-created / verification status banner */}
+      {p &&
+        (p.verified ? (
+          <div className="mt-5 rounded-xl bg-teal-50 p-4 ring-1 ring-teal-200">
             <p className="flex items-center gap-2 font-semibold text-teal-800">
               <BadgeCheck size={18} /> Your account is verified — families can see your Verified badge.
             </p>
-          ) : (
-            <>
-              <p className="text-base font-semibold text-brand-800">
-                🎉 Welcome, {data.name}! Your account has been created.
-              </p>
-              <p className="mt-0.5 text-sm text-brand-700">
-                Verify your account to earn the <span className="font-semibold">Verified badge</span> and win
-                families&apos; trust — use either method below.
-              </p>
-            </>
-          )}
-        </div>
-      )}
+          </div>
+        ) : p.verificationStatus === "REJECTED" ? (
+          <div className="mt-5 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+            <p className="flex items-center gap-2 font-semibold text-red-800">
+              <ShieldAlert size={18} /> Your document verification was not approved.
+            </p>
+            {p.verificationNote && <p className="mt-0.5 text-sm text-red-700">Reason: {p.verificationNote}</p>}
+            <p className="mt-0.5 text-sm text-red-700">Please re-upload a clear ID below.</p>
+          </div>
+        ) : p.hasIdDoc ? (
+          <div className="mt-5 rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
+            <p className="flex items-center gap-2 font-semibold text-amber-800">
+              <Clock size={18} /> Documents submitted — verification under review.
+            </p>
+            <p className="mt-0.5 text-sm text-amber-700">
+              An admin will review your ID shortly. You&apos;ll be notified once it&apos;s approved.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 rounded-xl bg-brand-50 p-4 ring-1 ring-brand-200">
+            <p className="text-base font-semibold text-brand-800">
+              🎉 Welcome, {data.name}! Your account has been created.
+            </p>
+            <p className="mt-0.5 text-sm text-brand-700">
+              Verify your account to earn the <span className="font-semibold">Verified badge</span> and win
+              families&apos; trust — use either method below.
+            </p>
+          </div>
+        ))}
 
       {/* Verification — two ways: email and/or documents */}
       {p && (

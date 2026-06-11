@@ -41,7 +41,8 @@ export default function VerificationSection({
   const [photo, setPhoto] = useState<Pick>(photoUrl ? { dataUrl: photoUrl, kind: "image" } : null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [open, setOpen] = useState(initialStatus !== "VERIFIED");
+  const [hasDoc, setHasDoc] = useState(hasIdDoc);
+  const [open, setOpen] = useState(initialStatus !== "VERIFIED" && !hasIdDoc);
 
   async function pick(file: File | undefined, set: (p: Pick) => void, kind: "id" | "photo") {
     if (!file) return;
@@ -80,6 +81,7 @@ export default function VerificationSection({
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Could not submit");
       setStatus("PENDING");
+      setHasDoc(true);
       setOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");
@@ -98,9 +100,9 @@ export default function VerificationSection({
     PENDING: {
       cls: "bg-amber-50 text-amber-800 ring-amber-200",
       icon: <Clock size={18} />,
-      title: hasIdDoc ? "Documents under review" : "Document verification",
-      text: hasIdDoc
-        ? "We've received your documents. An admin will review them shortly."
+      title: hasDoc ? "Documents submitted — under review" : "Document verification",
+      text: hasDoc
+        ? "We've received your documents. An admin will review them and you'll be notified."
         : "Upload an ID document — an admin approves it and you get the Verified badge.",
     },
     REJECTED: {
@@ -125,7 +127,7 @@ export default function VerificationSection({
         </div>
         {status !== "VERIFIED" && (
           <button onClick={() => setOpen((o) => !o)} className="ml-auto text-sm font-medium underline">
-            {open ? "Hide" : hasIdDoc ? "Re-upload" : "Upload"}
+            {open ? "Hide" : hasDoc ? "Re-upload" : "Upload"}
           </button>
         )}
       </div>

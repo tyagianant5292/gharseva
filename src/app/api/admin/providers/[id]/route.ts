@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { isAdmin } from "@/lib/admin";
+import { sendVerificationResultEmail } from "@/lib/email";
 
 const schema = z.object({
   action: z.enum(["approve", "reject"]),
@@ -19,14 +20,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
   const approve = parsed.data.action === "approve";
+  const note = approve ? null : parsed.data.note || "Documents not accepted.";
   const updated = await prisma.providerProfile.update({
     where: { id },
     data: {
       verified: approve,
       verificationStatus: approve ? "VERIFIED" : "REJECTED",
-      verificationNote: approve ? null : parsed.data.note || "Documents not accepted.",
+      verificationNote: note,
     },
+    include: { user: { select: { email: true, name: true } } },
   });
+
+  // Notify the helper by email (if they have one). Fire-and-forget.
+  if (updated.user.email) {
+    sendVerificationResultEmail(updated.user.email, updated.user.name, approve, note).catch(() => {});
+  }
 
   return NextResponse.json({ ok: true, verificationStatus: updated.verificationStatus });
 }
