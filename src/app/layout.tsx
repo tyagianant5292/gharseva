@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import EmailVerifyBanner from "@/components/EmailVerifyBanner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable}>
       <body className="flex min-h-screen flex-col">
         <Navbar />
+        <EmailVerifyBanner />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

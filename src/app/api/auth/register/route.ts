@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword, createSession } from "@/lib/auth";
 import { registerSchema } from "@/lib/validation";
+import { newToken, sendVerificationEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
   }
 
   const passwordHash = await hashPassword(d.password);
+  const verifyToken = newToken();
 
   const user = await prisma.user.create({
     data: {
@@ -28,6 +30,7 @@ export async function POST(req: Request) {
       mobile: d.mobile,
       passwordHash,
       role: d.role,
+      emailVerifyToken: verifyToken,
       // Provider: create profile. "Verified" = email + mobile both present (MVP policy).
       provider:
         d.role === "PROVIDER"
@@ -49,6 +52,9 @@ export async function POST(req: Request) {
           : undefined,
     },
   });
+
+  // Fire-and-forget verification email (won't block sign-up).
+  sendVerificationEmail(user.email, user.name, verifyToken).catch(() => {});
 
   await createSession({ id: user.id, email: user.email, name: user.name, role: user.role });
 
