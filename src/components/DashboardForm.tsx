@@ -9,6 +9,7 @@ import ProfileStatusToggle from "./ProfileStatusToggle";
 import ProfilePhotoCard from "./ProfilePhotoCard";
 import ProviderRequests from "./ProviderRequests";
 import LocationPicker from "./LocationPicker";
+import LocationFields, { type LocationValue } from "./LocationFields";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -55,6 +56,7 @@ function timeAgo(iso: string): string {
 export default function DashboardForm() {
   const [data, setData] = useState<Profile | null>(null);
   const [services, setServices] = useState<string[]>([]);
+  const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [tab, setTab] = useState<"overview" | "verify" | "edit">("overview");
@@ -65,6 +67,7 @@ export default function DashboardForm() {
       const d: Profile = await res.json();
       setData(d);
       setServices(d.provider?.services || []);
+      if (d.provider) setLoc({ city: d.provider.city, locality: d.provider.locality, pincode: d.provider.pincode });
     })();
   }, []);
 
@@ -84,9 +87,9 @@ export default function DashboardForm() {
         body: JSON.stringify({
           services,
           mobile: f.get("mobile"),
-          city: f.get("city"),
-          locality: f.get("locality"),
-          pincode: f.get("pincode"),
+          city: loc.city,
+          locality: loc.locality,
+          pincode: loc.pincode,
           gender: f.get("gender") || undefined,
           experienceYears: f.get("experienceYears") || 0,
           expectedSalary: f.get("expectedSalary") || undefined,
@@ -298,20 +301,7 @@ export default function DashboardForm() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div>
-                    <label className="label">City</label>
-                    <input name="city" defaultValue={p?.city} required className="input" />
-                  </div>
-                  <div>
-                    <label className="label">Locality</label>
-                    <input name="locality" defaultValue={p?.locality} required className="input" />
-                  </div>
-                  <div>
-                    <label className="label">Pincode</label>
-                    <input name="pincode" defaultValue={p?.pincode} required className="input" />
-                  </div>
-                </div>
+                <LocationFields value={loc} onChange={setLoc} />
 
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div>

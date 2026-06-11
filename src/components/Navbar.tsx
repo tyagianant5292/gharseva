@@ -40,9 +40,13 @@ export default async function Navbar() {
                 </Link>
               )}
               <span className="hidden text-sm text-slate-400 sm:block">·</span>
-              <span className="hidden max-w-[120px] truncate text-sm font-medium text-slate-700 sm:block">
+              <Link
+                href="/account"
+                title="My account"
+                className="hidden max-w-[120px] truncate text-sm font-medium text-slate-700 hover:text-brand-600 sm:block"
+              >
                 {user.name}
-              </span>
+              </Link>
               <LogoutButton />
             </>
           ) : (

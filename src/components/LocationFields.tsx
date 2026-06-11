@@ -1,0 +1,68 @@
+"use client";
+
+import { useState } from "react";
+import CityAutocomplete from "./CityAutocomplete";
+import { lookupPincode } from "@/lib/pincode";
+
+export type LocationValue = { city: string; locality: string; pincode: string };
+
+// Pincode → auto-fills city and offers area suggestions; city has autocomplete.
+export default function LocationFields({
+  value,
+  onChange,
+}: {
+  value: LocationValue;
+  onChange: (v: LocationValue) => void;
+}) {
+  const [areas, setAreas] = useState<string[]>([]);
+  const [looking, setLooking] = useState(false);
+
+  async function onPincode(pincode: string) {
+    onChange({ ...value, pincode });
+    if (/^[0-9]{6}$/.test(pincode)) {
+      setLooking(true);
+      const info = await lookupPincode(pincode);
+      setLooking(false);
+      if (info) {
+        setAreas(info.areas);
+        onChange({ city: info.city, pincode, locality: value.locality });
+      }
+    }
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      <div>
+        <label className="label">
+          Pincode {looking && <span className="text-xs font-normal text-slate-400">looking up…</span>}
+        </label>
+        <input
+          className="input"
+          inputMode="numeric"
+          placeholder="201301"
+          value={value.pincode}
+          onChange={(e) => onPincode(e.target.value)}
+        />
+      </div>
+      <div>
+        <label className="label">City</label>
+        <CityAutocomplete value={value.city} onChange={(city) => onChange({ ...value, city })} />
+      </div>
+      <div>
+        <label className="label">Locality / Area</label>
+        <input
+          className="input"
+          list="gs-area-options"
+          placeholder={areas.length ? "Pick or type area" : "Sector 62"}
+          value={value.locality}
+          onChange={(e) => onChange({ ...value, locality: e.target.value })}
+        />
+        <datalist id="gs-area-options">
+          {areas.map((a) => (
+            <option key={a} value={a} />
+          ))}
+        </datalist>
+      </div>
+    </div>
+  );
+}

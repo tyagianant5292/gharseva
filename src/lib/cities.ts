@@ -1,0 +1,26 @@
+// A curated list of Indian cities for search/registration autocomplete.
+// (The pincode lookup can fill in any city not listed here.)
+export const CITIES: string[] = [
+  "Mumbai", "Delhi", "New Delhi", "Bengaluru", "Hyderabad", "Ahmedabad", "Chennai", "Kolkata",
+  "Pune", "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal",
+  "Visakhapatnam", "Patna", "Vadodara", "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad",
+  "Meerut", "Rajkot", "Varanasi", "Srinagar", "Aurangabad", "Dhanbad", "Amritsar", "Navi Mumbai",
+  "Allahabad", "Prayagraj", "Ranchi", "Howrah", "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada",
+  "Jodhpur", "Madurai", "Raipur", "Kota", "Chandigarh", "Mohali", "Panchkula", "Guwahati", "Solapur",
+  "Hubli", "Mysuru", "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Moradabad", "Gurugram",
+  "Gurgaon", "Noida", "Greater Noida", "Jalandhar", "Bhubaneswar", "Salem", "Warangal", "Guntur",
+  "Bhiwandi", "Saharanpur", "Gorakhpur", "Bikaner", "Amravati", "Jamshedpur", "Bhilai", "Cuttack",
+  "Firozabad", "Kochi", "Nellore", "Bhavnagar", "Dehradun", "Durgapur", "Asansol", "Rourkela",
+  "Nanded", "Kolhapur", "Ajmer", "Akola", "Gulbarga", "Jamnagar", "Ujjain", "Loni", "Siliguri",
+  "Jhansi", "Ulhasnagar", "Jammu", "Sangli", "Mangaluru", "Mangalore", "Erode", "Belgaum", "Ambattur",
+  "Tirunelveli", "Malegaon", "Gaya", "Udaipur", "Maheshtala", "Davanagere", "Kozhikode", "Kurnool",
+  "Rajpur", "Bokaro", "South Dumdum", "Bellary", "Patiala", "Gopalpur", "Agartala", "Bhagalpur",
+  "Muzaffarnagar", "Bhatpara", "Panihati", "Latur", "Dhule", "Rohtak", "Korba", "Bhilwara",
+  "Berhampur", "Muzaffarpur", "Ahmednagar", "Mathura", "Kollam", "Avadi", "Kadapa", "Anantapur",
+  "Kamarhati", "Bilaspur", "Sambalpur", "Shahjahanpur", "Satara", "Bijapur", "Rampur", "Shivamogga",
+  "Chandrapur", "Junagadh", "Thrissur", "Alwar", "Bardhaman", "Kulti", "Nizamabad", "Parbhani",
+  "Tumkur", "Khammam", "Ozhukarai", "Bihar Sharif", "Panipat", "Darbhanga", "Bally", "Aizawl",
+  "Dewas", "Ichalkaranji", "Tirupati", "Karnal", "Bathinda", "Rae Bareli", "Sonipat", "Hapur",
+  "Haldia", "Hisar", "Yamunanagar", "Sagar", "Ratlam", "Hospet", "Ambala", "Karimnagar", "Anand",
+  "Etawah", "Thoothukudi", "Rewa", "Imphal", "Anantapuram", "Catraj", "Karawal Nagar", "Shimla",
+];

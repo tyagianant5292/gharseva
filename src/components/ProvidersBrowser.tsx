@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import { Search, SlidersHorizontal, LocateFixed, X, List, Map as MapIcon } from "lucide-react";
 import { SERVICES } from "@/lib/services";
 import ProviderCard, { type ProviderListItem } from "./ProviderCard";
+import CityAutocomplete from "./CityAutocomplete";
+import { lookupPincode } from "@/lib/pincode";
 
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
@@ -104,9 +106,23 @@ export default function ProvidersBrowser() {
             </option>
           ))}
         </select>
-        <input className="input" placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} disabled={nearMe} />
+        <CityAutocomplete value={city} onChange={setCity} disabled={nearMe} />
         <input className="input" placeholder="Locality" value={locality} onChange={(e) => setLocality(e.target.value)} disabled={nearMe} />
-        <input className="input" placeholder="Pincode" value={pincode} onChange={(e) => setPincode(e.target.value)} disabled={nearMe} />
+        <input
+          className="input"
+          placeholder="Pincode"
+          inputMode="numeric"
+          value={pincode}
+          onChange={async (e) => {
+            const v = e.target.value;
+            setPincode(v);
+            if (/^[0-9]{6}$/.test(v)) {
+              const info = await lookupPincode(v);
+              if (info) setCity(info.city);
+            }
+          }}
+          disabled={nearMe}
+        />
         <button type="submit" className="btn-primary justify-center">
           <Search size={16} /> Search
         </button>

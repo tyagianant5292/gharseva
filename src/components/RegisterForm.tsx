@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SERVICES } from "@/lib/services";
+import LocationFields, { type LocationValue } from "./LocationFields";
 
 type Role = "CUSTOMER" | "PROVIDER";
 
@@ -13,6 +14,7 @@ export default function RegisterForm() {
   const next = sp.get("next") || "";
   const [role, setRole] = useState<Role>((sp.get("role") as Role) === "PROVIDER" ? "PROVIDER" : "CUSTOMER");
   const [services, setServices] = useState<string[]>([]);
+  const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -35,9 +37,9 @@ export default function RegisterForm() {
     if (role === "PROVIDER") {
       Object.assign(payload, {
         services,
-        city: f.get("city"),
-        locality: f.get("locality"),
-        pincode: f.get("pincode"),
+        city: loc.city,
+        locality: loc.locality,
+        pincode: loc.pincode,
         gender: f.get("gender") || undefined,
         experienceYears: f.get("experienceYears") || 0,
         expectedSalary: f.get("expectedSalary") || undefined,
@@ -129,20 +131,7 @@ export default function RegisterForm() {
                   ))}
                 </div>
               </div>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div>
-                  <label className="label">City</label>
-                  <input name="city" className="input" placeholder="Noida" />
-                </div>
-                <div>
-                  <label className="label">Locality</label>
-                  <input name="locality" className="input" placeholder="Sector 62" />
-                </div>
-                <div>
-                  <label className="label">Pincode</label>
-                  <input name="pincode" className="input" placeholder="201301" />
-                </div>
-              </div>
+              <LocationFields value={loc} onChange={setLoc} />
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
                   <label className="label">Gender</label>
