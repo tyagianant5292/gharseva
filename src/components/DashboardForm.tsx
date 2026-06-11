@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { BadgeCheck, Save, Eye, Users } from "lucide-react";
 import { SERVICES } from "@/lib/services";
+import VerificationSection from "./VerificationSection";
 
 type Lead = { name: string; at: string };
+type Status = "PENDING" | "VERIFIED" | "REJECTED";
 
 type Profile = {
   name: string;
@@ -23,6 +25,11 @@ type Profile = {
     bio: string | null;
     available: boolean;
     verified: boolean;
+    verificationStatus: Status;
+    verificationNote: string | null;
+    idDocType: string | null;
+    hasIdDoc: boolean;
+    photoUrl: string | null;
   } | null;
 };
 
@@ -106,6 +113,16 @@ export default function DashboardForm() {
       <p className="mt-1 text-sm text-slate-500">
         Keep your details up to date so families nearby can find you.
       </p>
+
+      {/* Verification status + ID upload */}
+      {p && (
+        <VerificationSection
+          initialStatus={p.verificationStatus}
+          note={p.verificationNote}
+          hasIdDoc={p.hasIdDoc}
+          photoUrl={p.photoUrl}
+        />
+      )}
 
       {/* Profile views / leads */}
       <div className="mt-5 grid gap-4 sm:grid-cols-[auto_1fr]">

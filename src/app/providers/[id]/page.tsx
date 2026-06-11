@@ -17,6 +17,7 @@ type Detail = {
   experienceYears: number;
   expectedSalary?: number | null;
   bio?: string | null;
+  photoUrl?: string | null;
   verified: boolean;
   available: boolean;
   contact: { mobile: string; email: string } | null;
@@ -65,9 +66,18 @@ export default function ProviderDetailPage() {
 
       <div className="card mt-4 p-6">
         <div className="flex items-start gap-4">
-          <div className="grid h-16 w-16 flex-shrink-0 place-items-center rounded-full bg-brand-100 text-xl font-bold text-brand-700">
-            {p.name.split(" ").map((x) => x[0]).slice(0, 2).join("").toUpperCase()}
-          </div>
+          {p.photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={p.photoUrl}
+              alt={p.name}
+              className="h-16 w-16 flex-shrink-0 rounded-full object-cover ring-1 ring-slate-200"
+            />
+          ) : (
+            <div className="grid h-16 w-16 flex-shrink-0 place-items-center rounded-full bg-brand-100 text-xl font-bold text-brand-700">
+              {p.name.split(" ").map((x) => x[0]).slice(0, 2).join("").toUpperCase()}
+            </div>
+          )}
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-slate-900">{p.name}</h1>

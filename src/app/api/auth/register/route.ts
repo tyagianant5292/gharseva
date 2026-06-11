@@ -41,8 +41,9 @@ export async function POST(req: Request) {
                 experienceYears: d.experienceYears ?? 0,
                 expectedSalary: d.expectedSalary ?? null,
                 bio: d.bio || null,
-                verified: true,
-                verificationStatus: "VERIFIED",
+                // Starts unverified — provider uploads ID, admin approves.
+                verified: false,
+                verificationStatus: "PENDING",
               },
             }
           : undefined,

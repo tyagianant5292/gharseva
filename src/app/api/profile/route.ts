@@ -28,12 +28,31 @@ export async function GET() {
     recentLeads = leads.map((l) => ({ name: l.viewer.name, at: l.createdAt.toISOString() }));
   }
 
+  const p = user.provider;
   return NextResponse.json({
     name: user.name,
     email: user.email,
     mobile: user.mobile,
     role: user.role,
-    provider: user.provider,
+    provider: p
+      ? {
+          services: p.services,
+          city: p.city,
+          locality: p.locality,
+          pincode: p.pincode,
+          gender: p.gender,
+          experienceYears: p.experienceYears,
+          expectedSalary: p.expectedSalary,
+          bio: p.bio,
+          available: p.available,
+          verified: p.verified,
+          verificationStatus: p.verificationStatus,
+          verificationNote: p.verificationNote,
+          idDocType: p.idDocType,
+          hasIdDoc: Boolean(p.idDocUrl),
+          photoUrl: p.photoUrl,
+        }
+      : null,
     views,
     recentLeads,
   });
@@ -71,9 +90,7 @@ export async function PUT(req: Request) {
       expectedSalary: d.expectedSalary ?? null,
       bio: d.bio || null,
       available: d.available ?? true,
-      // Verified as long as we still have email + mobile (MVP policy).
-      verified: true,
-      verificationStatus: "VERIFIED",
+      // Verification is NOT changed here — it's controlled by admin approval.
     },
   });
 

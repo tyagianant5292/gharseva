@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Home } from "lucide-react";
 import { getSessionUser } from "@/lib/auth";
+import { isAdmin } from "@/lib/admin";
 import LogoutButton from "./LogoutButton";
 
 export default async function Navbar() {
   const user = await getSessionUser();
+  const admin = isAdmin(user);
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -24,6 +26,11 @@ export default async function Navbar() {
           </Link>
           {user ? (
             <>
+              {admin && (
+                <Link href="/admin" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+                  Admin
+                </Link>
+              )}
               {user.role === "PROVIDER" && (
                 <Link href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-brand-600">
                   My Profile

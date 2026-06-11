@@ -44,7 +44,10 @@ model ProviderProfile {
   experienceYears    Int                @default(0)
   expectedSalary     Int? // monthly, INR
   bio                String?
-  photoUrl           String?
+  photoUrl           String? // profile photo (data URL for MVP)
+  idDocUrl           String? // uploaded ID proof (data URL, admin-only)
+  idDocType          String? // e.g. Aadhaar / PAN / Driving License
+  verificationNote   String? // admin's note (e.g. rejection reason)
   available          Boolean            @default(true)
   verified           Boolean            @default(false)
   verificationStatus VerificationStatus @default(PENDING)

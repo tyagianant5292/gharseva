@@ -43,6 +43,7 @@ export async function GET(
       expectedSalary: p.expectedSalary,
       bio: p.bio,
       photoUrl: p.photoUrl,
+      verificationStatus: p.verificationStatus,
       verified: p.verified,
       available: p.available,
       // Gated contact:
