@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BadgeCheck, Save, Eye, Users, ShieldAlert, Clock } from "lucide-react";
+import { BadgeCheck, Save, Eye, Users, ShieldAlert, Clock, LayoutGrid, ShieldCheck, Pencil, MapPin, Mail } from "lucide-react";
 import { SERVICES } from "@/lib/services";
 import VerificationSection from "./VerificationSection";
 import EmailMethodCard from "./EmailMethodCard";
@@ -54,6 +54,7 @@ export default function DashboardForm() {
   const [services, setServices] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [tab, setTab] = useState<"overview" | "verify" | "edit">("overview");
 
   useEffect(() => {
     (async () => {
@@ -101,197 +102,248 @@ export default function DashboardForm() {
 
   if (!data) return <div className="container-x py-10 text-slate-500">Loading…</div>;
   const p = data.provider;
+  const initials = data.name.split(" ").map((x) => x[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+
+  const nav = [
+    { key: "overview" as const, label: "Overview", icon: <LayoutGrid size={16} /> },
+    { key: "verify" as const, label: "Verification", icon: <ShieldCheck size={16} /> },
+    { key: "edit" as const, label: "Edit profile", icon: <Pencil size={16} /> },
+  ];
+
+  const statusBanner = p ? (
+    p.verified ? (
+      <div className="mt-5 rounded-xl bg-teal-50 p-4 ring-1 ring-teal-200">
+        <p className="flex items-center gap-2 font-semibold text-teal-800">
+          <BadgeCheck size={18} /> Your account is verified — families can see your Verified badge.
+        </p>
+      </div>
+    ) : p.verificationStatus === "REJECTED" ? (
+      <div className="mt-5 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+        <p className="flex items-center gap-2 font-semibold text-red-800">
+          <ShieldAlert size={18} /> Your document verification was not approved.
+        </p>
+        {p.verificationNote && <p className="mt-0.5 text-sm text-red-700">Reason: {p.verificationNote}</p>}
+        <button onClick={() => setTab("verify")} className="mt-1 text-sm font-medium text-red-700 underline">
+          Re-upload documents →
+        </button>
+      </div>
+    ) : p.hasIdDoc ? (
+      <div className="mt-5 rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
+        <p className="flex items-center gap-2 font-semibold text-amber-800">
+          <Clock size={18} /> Documents submitted — verification under review.
+        </p>
+        <p className="mt-0.5 text-sm text-amber-700">An admin will review your ID shortly. You&apos;ll be notified once it&apos;s approved.</p>
+      </div>
+    ) : (
+      <div className="mt-5 rounded-xl bg-brand-50 p-4 ring-1 ring-brand-200">
+        <p className="text-base font-semibold text-brand-800">🎉 Welcome, {data.name}! Your account has been created.</p>
+        <p className="mt-0.5 text-sm text-brand-700">
+          Verify your account to earn the <span className="font-semibold">Verified badge</span>.{" "}
+          <button onClick={() => setTab("verify")} className="font-medium underline">Get verified →</button>
+        </p>
+      </div>
+    )
+  ) : null;
 
   return (
-    <div className="container-x max-w-2xl py-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">My helper profile</h1>
-        {p?.verified && (
-          <span className="badge-verified">
-            <BadgeCheck size={14} /> Verified
-          </span>
-        )}
-      </div>
-      <p className="mt-1 text-sm text-slate-500">
-        Keep your details up to date so families nearby can find you.
-      </p>
+    <div className="container-x py-6">
+      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+        {/* Sidebar */}
+        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+          <div className="card overflow-hidden">
+            <div className="h-16 bg-gradient-to-r from-brand-500 to-brand-600" />
+            <div className="-mt-10 px-5 pb-5 text-center">
+              {p?.photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.photoUrl} alt={data.name} className="mx-auto h-20 w-20 rounded-full object-cover ring-4 ring-white" />
+              ) : (
+                <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-brand-100 text-2xl font-bold text-brand-700 ring-4 ring-white">
+                  {initials}
+                </div>
+              )}
+              <h2 className="mt-2 font-bold text-slate-900">{data.name}</h2>
+              <div className="mt-1.5 flex flex-wrap justify-center gap-1.5">
+                {p?.verified && (
+                  <span className="badge-verified">
+                    <BadgeCheck size={12} /> Verified
+                  </span>
+                )}
+                {data.emailVerified && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-1.5 py-0.5 text-xs font-semibold text-sky-700 ring-1 ring-sky-200">
+                    <Mail size={11} /> Email
+                  </span>
+                )}
+              </div>
+              {p && (
+                <p className="mt-1.5 flex items-center justify-center gap-1 text-xs text-slate-500">
+                  <MapPin size={11} /> {p.locality}, {p.city}
+                </p>
+              )}
+            </div>
+          </div>
 
-      {/* Account-created / verification status banner */}
-      {p &&
-        (p.verified ? (
-          <div className="mt-5 rounded-xl bg-teal-50 p-4 ring-1 ring-teal-200">
-            <p className="flex items-center gap-2 font-semibold text-teal-800">
-              <BadgeCheck size={18} /> Your account is verified — families can see your Verified badge.
-            </p>
-          </div>
-        ) : p.verificationStatus === "REJECTED" ? (
-          <div className="mt-5 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
-            <p className="flex items-center gap-2 font-semibold text-red-800">
-              <ShieldAlert size={18} /> Your document verification was not approved.
-            </p>
-            {p.verificationNote && <p className="mt-0.5 text-sm text-red-700">Reason: {p.verificationNote}</p>}
-            <p className="mt-0.5 text-sm text-red-700">Please re-upload a clear ID below.</p>
-          </div>
-        ) : p.hasIdDoc ? (
-          <div className="mt-5 rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
-            <p className="flex items-center gap-2 font-semibold text-amber-800">
-              <Clock size={18} /> Documents submitted — verification under review.
-            </p>
-            <p className="mt-0.5 text-sm text-amber-700">
-              An admin will review your ID shortly. You&apos;ll be notified once it&apos;s approved.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-5 rounded-xl bg-brand-50 p-4 ring-1 ring-brand-200">
-            <p className="text-base font-semibold text-brand-800">
-              🎉 Welcome, {data.name}! Your account has been created.
-            </p>
-            <p className="mt-0.5 text-sm text-brand-700">
-              Verify your account to earn the <span className="font-semibold">Verified badge</span> and win
-              families&apos; trust — use either method below.
-            </p>
-          </div>
-        ))}
-
-      {/* Profile photo */}
-      {p && <ProfilePhotoCard initialPhoto={p.photoUrl} name={data.name} />}
-
-      {/* Profile active / disabled toggle */}
-      {p && <ProfileStatusToggle initial={p.available} />}
-
-      {/* Incoming booking requests */}
-      {p && <ProviderRequests />}
-
-      {/* Verification — two ways: email and/or documents */}
-      {p && (
-        <div className="mt-5">
-          <h2 className="text-sm font-semibold text-slate-700">
-            Get verified <span className="font-normal text-slate-400">— do either or both</span>
-          </h2>
-          <p className="mt-0.5 text-xs text-slate-400">
-            Email confirmation is a light trust signal; the admin document check gives the trusted Verified badge.
-          </p>
-          <div className="mt-3">
-            <EmailMethodCard email={data.email} emailVerified={data.emailVerified} />
-          </div>
-          <VerificationSection
-            initialStatus={p.verificationStatus}
-            note={p.verificationNote}
-            hasIdDoc={p.hasIdDoc}
-          />
-        </div>
-      )}
-
-      {/* Profile views / leads */}
-      <div className="mt-5 grid gap-4 sm:grid-cols-[auto_1fr]">
-        <div className="card flex items-center gap-4 p-5">
-          <div className="grid h-12 w-12 place-items-center rounded-xl bg-brand-100 text-brand-700">
-            <Eye size={22} />
-          </div>
-          <div>
-            <div className="text-2xl font-extrabold text-slate-900">{data.views}</div>
-            <div className="text-sm text-slate-500">profile {data.views === 1 ? "view" : "views"}</div>
-          </div>
-        </div>
-        <div className="card p-5">
-          <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-            <Users size={15} /> Recent interest
-          </h2>
-          {data.recentLeads.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-400">
-              No one has unlocked your contact yet. Keep your profile complete to get noticed.
-            </p>
-          ) : (
-            <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-              {data.recentLeads.map((l, i) => (
-                <li key={i} className="text-sm text-slate-600">
-                  <span className="font-medium text-slate-800">{l.name}</span>{" "}
-                  <span className="text-slate-400">· {timeAgo(l.at)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-
-      <form onSubmit={save} className="card mt-5 space-y-4 p-6">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="label">Name</label>
-            <input className="input bg-slate-50" value={data.name} disabled />
-          </div>
-          <div>
-            <label className="label">Mobile number</label>
-            <input name="mobile" defaultValue={data.mobile} required className="input" />
-          </div>
-        </div>
-
-        <div>
-          <label className="label">Services</label>
-          <div className="flex flex-wrap gap-2">
-            {SERVICES.map((s) => (
+          <nav className="card p-2">
+            {nav.map((n) => (
               <button
-                key={s.key}
-                type="button"
-                onClick={() => toggleService(s.key)}
-                className={`rounded-full px-3 py-1 text-sm font-medium ring-1 transition-colors ${
-                  services.includes(s.key)
-                    ? "bg-brand-600 text-white ring-brand-600"
-                    : "bg-white text-slate-600 ring-slate-300 hover:ring-brand-300"
+                key={n.key}
+                onClick={() => setTab(n.key)}
+                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  tab === n.key ? "bg-brand-50 text-brand-700" : "text-slate-600 hover:bg-slate-50"
                 }`}
               >
-                {s.icon} {s.label}
+                {n.icon} {n.label}
               </button>
             ))}
-          </div>
-        </div>
+          </nav>
+        </aside>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label className="label">City</label>
-            <input name="city" defaultValue={p?.city} required className="input" />
-          </div>
-          <div>
-            <label className="label">Locality</label>
-            <input name="locality" defaultValue={p?.locality} required className="input" />
-          </div>
-          <div>
-            <label className="label">Pincode</label>
-            <input name="pincode" defaultValue={p?.pincode} required className="input" />
-          </div>
-        </div>
+        {/* Main */}
+        <main className="min-w-0">
+          {tab === "overview" && (
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">Overview</h1>
+              {statusBanner}
+              {p && <ProfileStatusToggle initial={p.available} />}
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label className="label">Gender</label>
-            <select name="gender" defaultValue={p?.gender || ""} className="input">
-              <option value="">Prefer not to say</option>
-              <option>Female</option>
-              <option>Male</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div>
-            <label className="label">Experience (yrs)</label>
-            <input name="experienceYears" type="number" min={0} defaultValue={p?.experienceYears ?? 0} className="input" />
-          </div>
-          <div>
-            <label className="label">Expected ₹/month</label>
-            <input name="expectedSalary" type="number" min={0} defaultValue={p?.expectedSalary ?? ""} className="input" />
-          </div>
-        </div>
+              <div className="mt-5 grid gap-4 sm:grid-cols-[auto_1fr]">
+                <div className="card flex items-center gap-4 p-5">
+                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-brand-100 text-brand-700">
+                    <Eye size={22} />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-extrabold text-slate-900">{data.views}</div>
+                    <div className="text-sm text-slate-500">profile {data.views === 1 ? "view" : "views"}</div>
+                  </div>
+                </div>
+                <div className="card p-5">
+                  <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+                    <Users size={15} /> Recent interest
+                  </h2>
+                  {data.recentLeads.length === 0 ? (
+                    <p className="mt-2 text-sm text-slate-400">No one has unlocked your contact yet.</p>
+                  ) : (
+                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                      {data.recentLeads.map((l, i) => (
+                        <li key={i} className="text-sm text-slate-600">
+                          <span className="font-medium text-slate-800">{l.name}</span>{" "}
+                          <span className="text-slate-400">· {timeAgo(l.at)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
 
-        <div>
-          <label className="label">About</label>
-          <textarea name="bio" rows={3} defaultValue={p?.bio || ""} className="input" />
-        </div>
+              {p && <ProviderRequests />}
+            </div>
+          )}
 
-        {msg && <p className={`text-sm ${msg.ok ? "text-teal-600" : "text-red-600"}`}>{msg.text}</p>}
+          {tab === "verify" && (
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">Get verified</h1>
+              <p className="mt-0.5 text-sm text-slate-500">
+                Email confirmation is a light trust signal; the admin document check gives the trusted Verified badge.
+              </p>
+              <div className="mt-4">
+                <EmailMethodCard email={data.email} emailVerified={data.emailVerified} />
+              </div>
+              {p && (
+                <VerificationSection
+                  initialStatus={p.verificationStatus}
+                  note={p.verificationNote}
+                  hasIdDoc={p.hasIdDoc}
+                />
+              )}
+            </div>
+          )}
 
-        <button type="submit" disabled={saving} className="btn-primary justify-center">
-          <Save size={16} /> {saving ? "Saving…" : "Save profile"}
-        </button>
-      </form>
+          {tab === "edit" && (
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">Edit profile</h1>
+              {p && <ProfilePhotoCard initialPhoto={p.photoUrl} name={data.name} />}
+
+              <form onSubmit={save} className="card mt-5 space-y-4 p-6">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="label">Name</label>
+                    <input className="input bg-slate-50" value={data.name} disabled />
+                  </div>
+                  <div>
+                    <label className="label">Mobile number</label>
+                    <input name="mobile" defaultValue={data.mobile} required className="input" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label">Services</label>
+                  <div className="flex flex-wrap gap-2">
+                    {SERVICES.map((s) => (
+                      <button
+                        key={s.key}
+                        type="button"
+                        onClick={() => toggleService(s.key)}
+                        className={`rounded-full px-3 py-1 text-sm font-medium ring-1 transition-colors ${
+                          services.includes(s.key)
+                            ? "bg-brand-600 text-white ring-brand-600"
+                            : "bg-white text-slate-600 ring-slate-300 hover:ring-brand-300"
+                        }`}
+                      >
+                        {s.icon} {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div>
+                    <label className="label">City</label>
+                    <input name="city" defaultValue={p?.city} required className="input" />
+                  </div>
+                  <div>
+                    <label className="label">Locality</label>
+                    <input name="locality" defaultValue={p?.locality} required className="input" />
+                  </div>
+                  <div>
+                    <label className="label">Pincode</label>
+                    <input name="pincode" defaultValue={p?.pincode} required className="input" />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div>
+                    <label className="label">Gender</label>
+                    <select name="gender" defaultValue={p?.gender || ""} className="input">
+                      <option value="">Prefer not to say</option>
+                      <option>Female</option>
+                      <option>Male</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label">Experience (yrs)</label>
+                    <input name="experienceYears" type="number" min={0} defaultValue={p?.experienceYears ?? 0} className="input" />
+                  </div>
+                  <div>
+                    <label className="label">Expected ₹/month</label>
+                    <input name="expectedSalary" type="number" min={0} defaultValue={p?.expectedSalary ?? ""} className="input" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label">About</label>
+                  <textarea name="bio" rows={3} defaultValue={p?.bio || ""} className="input" />
+                </div>
+
+                {msg && <p className={`text-sm ${msg.ok ? "text-teal-600" : "text-red-600"}`}>{msg.text}</p>}
+
+                <button type="submit" disabled={saving} className="btn-primary justify-center">
+                  <Save size={16} /> {saving ? "Saving…" : "Save profile"}
+                </button>
+              </form>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
