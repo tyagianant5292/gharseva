@@ -15,18 +15,24 @@ export async function POST(req: Request) {
   }
   const d = parsed.data;
 
-  const existing = await prisma.user.findUnique({ where: { email: d.email } });
-  if (existing) {
-    return NextResponse.json({ error: "An account with this email already exists" }, { status: 409 });
+  // Email is optional, but unique when given.
+  if (d.email) {
+    const byEmail = await prisma.user.findUnique({ where: { email: d.email } });
+    if (byEmail)
+      return NextResponse.json({ error: "An account with this email already exists" }, { status: 409 });
   }
+  // Mobile is the primary identity — must be unique.
+  const byMobile = await prisma.user.findFirst({ where: { mobile: d.mobile } });
+  if (byMobile)
+    return NextResponse.json({ error: "An account with this mobile number already exists" }, { status: 409 });
 
   const passwordHash = await hashPassword(d.password);
-  const verifyToken = newToken();
+  const verifyToken = d.email ? newToken() : null;
 
   const user = await prisma.user.create({
     data: {
       name: d.name,
-      email: d.email,
+      email: d.email ?? null,
       mobile: d.mobile,
       passwordHash,
       role: d.role,
@@ -53,10 +59,12 @@ export async function POST(req: Request) {
     },
   });
 
-  // Fire-and-forget verification email (won't block sign-up).
-  sendVerificationEmail(user.email, user.name, verifyToken).catch(() => {});
+  // Fire-and-forget verification email — only if an email was provided.
+  if (user.email && verifyToken) {
+    sendVerificationEmail(user.email, user.name, verifyToken).catch(() => {});
+  }
 
-  await createSession({ id: user.id, email: user.email, name: user.name, role: user.role });
+  await createSession({ id: user.id, email: user.email ?? "", name: user.name, role: user.role });
 
-  return NextResponse.json({ ok: true, role: user.role });
+  return NextResponse.json({ ok: true, role: user.role, hasEmail: Boolean(user.email) });
 }

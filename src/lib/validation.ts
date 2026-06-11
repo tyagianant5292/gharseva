@@ -6,10 +6,15 @@ const mobile = z
   .trim()
   .regex(/^[+]?[0-9\s-]{7,15}$/, "Enter a valid mobile number");
 
+// Optional email: empty string / undefined is allowed; if present it must be valid.
+const optionalEmail = z
+  .union([z.string().trim().toLowerCase().email("Invalid email"), z.literal(""), z.undefined()])
+  .transform((v) => (v ? v : undefined));
+
 export const registerSchema = z
   .object({
     name: z.string().trim().min(2, "Name is too short").max(80),
-    email: z.string().trim().toLowerCase().email("Invalid email"),
+    email: optionalEmail,
     mobile,
     password: z.string().min(6, "Password must be at least 6 characters").max(100),
     role: z.enum(["CUSTOMER", "PROVIDER"]),
@@ -36,8 +41,9 @@ export const registerSchema = z
     }
   });
 
+// Login by mobile number OR email.
 export const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Invalid email"),
+  identifier: z.string().trim().min(3, "Enter your mobile number or email"),
   password: z.string().min(1, "Password is required"),
 });
 

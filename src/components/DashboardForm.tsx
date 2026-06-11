@@ -4,13 +4,15 @@ import { useEffect, useState } from "react";
 import { BadgeCheck, Save, Eye, Users } from "lucide-react";
 import { SERVICES } from "@/lib/services";
 import VerificationSection from "./VerificationSection";
+import EmailMethodCard from "./EmailMethodCard";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
 
 type Profile = {
   name: string;
-  email: string;
+  email: string | null;
+  emailVerified: boolean;
   mobile: string;
   views: number;
   recentLeads: Lead[];
@@ -114,14 +116,32 @@ export default function DashboardForm() {
         Keep your details up to date so families nearby can find you.
       </p>
 
-      {/* Verification status + ID upload */}
+      {/* Verification — two ways: email and/or documents */}
       {p && (
-        <VerificationSection
-          initialStatus={p.verificationStatus}
-          note={p.verificationNote}
-          hasIdDoc={p.hasIdDoc}
-          photoUrl={p.photoUrl}
-        />
+        <div className="mt-5">
+          <h2 className="text-sm font-semibold text-slate-700">
+            Get verified <span className="font-normal text-slate-400">— do either or both</span>
+          </h2>
+          <p className="text-xs text-slate-400">
+            The <span className="font-medium">document</span> check (admin-approved) gives you the trusted
+            Verified badge. Email confirmation is an extra trust signal.
+          </p>
+          <div className="mt-3 grid gap-4 lg:grid-cols-2">
+            <EmailMethodCard email={data.email} emailVerified={data.emailVerified} />
+            <div className="card p-4">
+              <p className="text-sm font-semibold text-slate-800">Document verification</p>
+              <p className="mt-1 text-xs text-slate-400">
+                Upload your ID — an admin approves it and you get the Verified badge. See below.
+              </p>
+            </div>
+          </div>
+          <VerificationSection
+            initialStatus={p.verificationStatus}
+            note={p.verificationNote}
+            hasIdDoc={p.hasIdDoc}
+            photoUrl={p.photoUrl}
+          />
+        </div>
       )}
 
       {/* Profile views / leads */}

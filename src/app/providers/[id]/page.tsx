@@ -20,7 +20,7 @@ type Detail = {
   photoUrl?: string | null;
   verified: boolean;
   available: boolean;
-  contact: { mobile: string; email: string } | null;
+  contact: { mobile: string; email: string | null } | null;
 };
 
 export default function ProviderDetailPage() {
@@ -130,9 +130,11 @@ export default function ProviderDetailPage() {
               <a href={`tel:${p.contact.mobile}`} className="flex items-center gap-2 text-slate-800 hover:text-brand-600">
                 <Phone size={16} className="text-brand-600" /> {p.contact.mobile}
               </a>
-              <a href={`mailto:${p.contact.email}`} className="flex items-center gap-2 text-slate-800 hover:text-brand-600">
-                <Mail size={16} className="text-brand-600" /> {p.contact.email}
-              </a>
+              {p.contact.email && (
+                <a href={`mailto:${p.contact.email}`} className="flex items-center gap-2 text-slate-800 hover:text-brand-600">
+                  <Mail size={16} className="text-brand-600" /> {p.contact.email}
+                </a>
+              )}
             </div>
           ) : (
             <div className="mt-2">

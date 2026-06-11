@@ -20,7 +20,7 @@ export default function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: f.get("email"), password: f.get("password") }),
+        body: JSON.stringify({ identifier: f.get("identifier"), password: f.get("password") }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login failed");
@@ -39,8 +39,8 @@ export default function LoginForm() {
         <p className="mt-1 text-sm text-slate-500">Log in to your GharSeva account.</p>
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
-            <label className="label">Email</label>
-            <input name="email" type="email" required className="input" placeholder="you@example.com" />
+            <label className="label">Mobile number or email</label>
+            <input name="identifier" required className="input" placeholder="+91 98765 43210  or  you@example.com" />
           </div>
           <div>
             <label className="label">Password</label>

@@ -11,7 +11,7 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export type SessionUser = {
   id: string;
-  email: string;
+  email: string; // "" when the user has no email
   name: string;
   role: "CUSTOMER" | "PROVIDER" | "ADMIN";
 };

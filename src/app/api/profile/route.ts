@@ -32,6 +32,7 @@ export async function GET() {
   return NextResponse.json({
     name: user.name,
     email: user.email,
+    emailVerified: user.emailVerified,
     mobile: user.mobile,
     role: user.role,
     provider: p

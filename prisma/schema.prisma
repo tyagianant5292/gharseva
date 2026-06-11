@@ -22,7 +22,8 @@ enum VerificationStatus {
 
 model User {
   id               String           @id @default(cuid())
-  email            String           @unique
+  // Email is OPTIONAL — many helpers don't have one. Mobile is the primary identity.
+  email            String?          @unique
   passwordHash     String
   name             String
   mobile           String

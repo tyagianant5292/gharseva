@@ -9,6 +9,7 @@ export async function POST() {
 
   const user = await prisma.user.findUnique({ where: { id: session.id } });
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!user.email) return NextResponse.json({ ok: true, noEmail: true });
   if (user.emailVerified) return NextResponse.json({ ok: true, alreadyVerified: true });
 
   const token = newToken();

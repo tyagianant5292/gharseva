@@ -12,13 +12,19 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  const { email, password } = parsed.data;
+  const { identifier, password } = parsed.data;
+  const id = identifier.trim();
+  const looksLikeEmail = id.includes("@");
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  // Look up by email or by mobile number.
+  const user = looksLikeEmail
+    ? await prisma.user.findUnique({ where: { email: id.toLowerCase() } })
+    : await prisma.user.findFirst({ where: { mobile: id } });
+
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
-    return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+    return NextResponse.json({ error: "Invalid login or password" }, { status: 401 });
   }
 
-  await createSession({ id: user.id, email: user.email, name: user.name, role: user.role });
+  await createSession({ id: user.id, email: user.email ?? "", name: user.name, role: user.role });
   return NextResponse.json({ ok: true, role: user.role });
 }

@@ -14,7 +14,8 @@ export default function EmailVerifyBanner() {
       try {
         const res = await fetch("/api/auth/me");
         const d = await res.json();
-        if (d.user && !d.user.emailVerified) {
+        // Only nudge users who actually have an email on file.
+        if (d.user && d.user.email && !d.user.emailVerified) {
           setEmail(d.user.email);
           setShow(true);
         }

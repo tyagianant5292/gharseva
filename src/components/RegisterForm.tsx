@@ -96,14 +96,17 @@ export default function RegisterForm() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="label">Email</label>
-              <input name="email" type="email" required className="input" placeholder="you@example.com" />
+              <label className="label">Email <span className="font-normal text-slate-400">(optional)</span></label>
+              <input name="email" type="email" className="input" placeholder="you@example.com" />
             </div>
             <div>
               <label className="label">Password</label>
               <input name="password" type="password" required minLength={6} className="input" placeholder="min 6 characters" />
             </div>
           </div>
+          <p className="-mt-2 text-xs text-slate-400">
+            No email? No problem — you can sign up and log in with just your mobile number.
+          </p>
 
           {role === "PROVIDER" && (
             <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
