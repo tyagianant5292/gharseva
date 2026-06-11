@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model User {
+  id           String           @id @default(cuid())
+  email        String           @unique
+  passwordHash String
+  name         String
+  mobile       String
+  role         Role             @default(CUSTOMER)
+  createdAt    DateTime         @default(now())
+  provider     ProviderProfile?
+  contactViews ContactView[]    @relation("ViewerContacts")
+}
+
+model ProviderProfile {
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  services           String[] // e.g. ["MAID", "COOK"]
+  city               String
+  locality           String
+  pincode            String
+  gender             String?
+  experienceYears    Int                @default(0)
+  expectedSalary     Int? // monthly, INR
+  bio                String?
+  photoUrl           String?
+  available          Boolean            @default(true)
+  verified           Boolean            @default(false)
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  contactViews       ContactView[]
+
+  @@index([city])
+  @@index([pincode])
+  @@index([verified])
+}
+
+// Records when a logged-in customer reveals a provider's contact (gating + leads).
+model ContactView {
+  id         String          @id @default(cuid())
+  viewerId   String
+  viewer     User            @relation("ViewerContacts", fields: [viewerId], references: [id], onDelete: Cascade)
+  providerId String
+  provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime        @default(now())
+
+  @@unique([viewerId, providerId])
+}
