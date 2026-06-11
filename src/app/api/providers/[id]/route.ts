@@ -39,6 +39,13 @@ export async function GET(
 
   const myReview = session ? reviews.find((r) => r.author.id === session.id) : undefined;
 
+  const myRequest = session
+    ? await prisma.bookingRequest.findUnique({
+        where: { customerId_providerId: { customerId: session.id, providerId: p.id } },
+        select: { status: true, service: true, message: true, preferredTime: true },
+      })
+    : null;
+
   return NextResponse.json({
     provider: {
       id: p.id,
@@ -62,8 +69,9 @@ export async function GET(
       contact: canSeeContact ? { mobile: p.user.mobile, email: p.user.email } : null,
     },
     canSeeContact,
-    // The viewer can review once they're logged in (viewing already unlocked contact) and it's not their own profile.
+    // The viewer can review/request once logged in and it's not their own profile.
     canReview: Boolean(session) && session?.id !== p.userId,
+    myRequest,
     myReview: myReview ? { rating: myReview.rating, comment: myReview.comment } : null,
     reviews: reviews.map((r) => ({
       id: r.id,

@@ -88,6 +88,36 @@ export async function sendVerificationResultEmail(
   return send(to, name, subject, html);
 }
 
+export async function sendBookingRequestEmail(
+  to: string,
+  providerName: string,
+  customerName: string,
+  service?: string | null,
+): Promise<boolean> {
+  const html = `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto">
+      <h2 style="color:#ea580c">New booking request</h2>
+      <p>Hi ${escapeHtml(providerName)}, <b>${escapeHtml(customerName)}</b> has requested your help${service ? ` for <b>${escapeHtml(service)}</b>` : ""}.</p>
+      <p style="margin:20px 0"><a href="${SITE_URL}/dashboard" style="background:#ea580c;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">View &amp; respond</a></p>
+    </div>`;
+  return send(to, providerName, "New booking request on GharSeva", html);
+}
+
+export async function sendBookingStatusEmail(
+  to: string,
+  customerName: string,
+  providerName: string,
+  accepted: boolean,
+): Promise<boolean> {
+  const subject = accepted ? `${providerName} accepted your request ✅` : `${providerName} declined your request`;
+  const html = `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto">
+      <h2 style="color:${accepted ? "#0d9488" : "#dc2626"}">${accepted ? "Request accepted 🎉" : "Request declined"}</h2>
+      <p>Hi ${escapeHtml(customerName)}, <b>${escapeHtml(providerName)}</b> has ${accepted ? "accepted" : "declined"} your booking request.</p>
+      ${accepted ? `<p>You can now contact them directly to arrange the details.</p>` : ""}
+      <p style="margin:20px 0"><a href="${SITE_URL}/requests" style="background:#ea580c;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">View my requests</a></p>
+    </div>`;
+  return send(to, customerName, subject, html);
+}
+
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string,

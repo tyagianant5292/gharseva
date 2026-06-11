@@ -20,6 +20,12 @@ enum VerificationStatus {
   REJECTED
 }
 
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 model User {
   id               String           @id @default(cuid())
   // Email is OPTIONAL — many helpers don't have one. Mobile is the primary identity.
@@ -34,6 +40,7 @@ model User {
   provider         ProviderProfile?
   contactViews     ContactView[]    @relation("ViewerContacts")
   reviews          Review[]         @relation("AuthoredReviews")
+  bookingRequests  BookingRequest[] @relation("CustomerRequests")
 }
 
 model ProviderProfile {
@@ -63,10 +70,29 @@ model ProviderProfile {
   updatedAt          DateTime           @updatedAt
   contactViews       ContactView[]
   reviews            Review[]
+  bookingRequests    BookingRequest[]
 
   @@index([city])
   @@index([pincode])
   @@index([verified])
+}
+
+model BookingRequest {
+  id            String          @id @default(cuid())
+  customerId    String
+  customer      User            @relation("CustomerRequests", fields: [customerId], references: [id], onDelete: Cascade)
+  providerId    String
+  provider      ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  service       String?
+  message       String?
+  preferredTime String?
+  status        RequestStatus   @default(PENDING)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([customerId, providerId])
+  @@index([providerId])
+  @@index([customerId])
 }
 
 model Review {

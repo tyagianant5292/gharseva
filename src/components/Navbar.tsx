@@ -31,6 +31,9 @@ export default async function Navbar() {
                   Admin
                 </Link>
               )}
+              <Link href="/requests" className="hidden text-sm font-medium text-slate-600 hover:text-brand-600 sm:block">
+                My Requests
+              </Link>
               {user.role === "PROVIDER" && (
                 <Link href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-brand-600">
                   My Profile

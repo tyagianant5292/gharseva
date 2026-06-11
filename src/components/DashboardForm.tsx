@@ -7,6 +7,7 @@ import VerificationSection from "./VerificationSection";
 import EmailMethodCard from "./EmailMethodCard";
 import ProfileStatusToggle from "./ProfileStatusToggle";
 import ProfilePhotoCard from "./ProfilePhotoCard";
+import ProviderRequests from "./ProviderRequests";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -157,6 +158,9 @@ export default function DashboardForm() {
 
       {/* Profile active / disabled toggle */}
       {p && <ProfileStatusToggle initial={p.available} />}
+
+      {/* Incoming booking requests */}
+      {p && <ProviderRequests />}
 
       {/* Verification — two ways: email and/or documents */}
       {p && (

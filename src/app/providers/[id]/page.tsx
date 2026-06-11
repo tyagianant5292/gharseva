@@ -7,6 +7,9 @@ import { BadgeCheck, MapPin, Briefcase, Phone, Mail, Lock, ArrowLeft } from "luc
 import { serviceLabel, serviceIcon } from "@/lib/services";
 import Stars from "@/components/Stars";
 import ReviewsSection, { type Review } from "@/components/ReviewsSection";
+import RequestHelperButton from "@/components/RequestHelperButton";
+
+type MyRequest = { status: "PENDING" | "ACCEPTED" | "DECLINED"; service: string | null; message: string | null; preferredTime: string | null };
 
 type Detail = {
   id: string;
@@ -34,6 +37,7 @@ export default function ProviderDetailPage() {
   const [canSee, setCanSee] = useState(false);
   const [canReview, setCanReview] = useState(false);
   const [myReview, setMyReview] = useState<{ rating: number; comment: string | null } | null>(null);
+  const [myRequest, setMyRequest] = useState<MyRequest | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -49,6 +53,7 @@ export default function ProviderDetailPage() {
     setCanSee(data.canSeeContact);
     setCanReview(data.canReview);
     setMyReview(data.myReview);
+    setMyRequest(data.myRequest);
     setReviews(data.reviews || []);
   }, [id]);
 
@@ -178,6 +183,19 @@ export default function ProviderDetailPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Booking request */}
+      <div className="mt-4">
+        <RequestHelperButton
+          providerId={p.id}
+          providerName={p.name}
+          services={p.services}
+          canRequest={canReview}
+          loggedIn={canSee}
+          initialRequest={myRequest}
+          onChange={load}
+        />
       </div>
 
       <ReviewsSection
