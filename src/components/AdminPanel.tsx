@@ -18,8 +18,39 @@ type Row = {
   verificationNote: string | null;
   idDocType: string | null;
   idDocUrl: string | null;
+  idDocBackUrl: string | null;
   photoUrl: string | null;
 };
+
+function isPdf(url: string) {
+  return url.startsWith("data:application/pdf");
+}
+
+function DocThumb({ url, label, onZoom }: { url: string; label: string; onZoom: (u: string) => void }) {
+  return (
+    <div>
+      <span className="block text-xs text-slate-400">{label}</span>
+      {isPdf(url) ? (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="grid h-16 w-24 place-items-center rounded bg-slate-100 text-xs font-medium text-brand-600 ring-1 ring-slate-200 hover:bg-slate-200"
+        >
+          📄 View PDF
+        </a>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={url}
+          alt={label}
+          onClick={() => onZoom(url)}
+          className="h-16 w-24 cursor-zoom-in rounded object-cover ring-1 ring-slate-200"
+        />
+      )}
+    </div>
+  );
+}
 
 const TABS = ["PENDING", "VERIFIED", "REJECTED", "ALL"] as const;
 
@@ -119,11 +150,10 @@ export default function AdminPanel() {
 
                 <div className="flex items-center gap-3">
                   {r.idDocUrl ? (
-                    <button onClick={() => setZoom(r.idDocUrl)} className="text-left">
-                      <span className="block text-xs text-slate-400">{r.idDocType || "ID"}</span>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={r.idDocUrl} alt="ID" className="h-16 w-24 cursor-zoom-in rounded object-cover ring-1 ring-slate-200" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <DocThumb url={r.idDocUrl} label={`${r.idDocType || "ID"} · front`} onZoom={setZoom} />
+                      {r.idDocBackUrl && <DocThumb url={r.idDocBackUrl} label="back" onZoom={setZoom} />}
+                    </div>
                   ) : (
                     <span className="text-xs text-slate-400">No ID uploaded</span>
                   )}

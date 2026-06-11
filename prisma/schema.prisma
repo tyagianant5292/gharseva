@@ -45,7 +45,8 @@ model ProviderProfile {
   expectedSalary     Int? // monthly, INR
   bio                String?
   photoUrl           String? // profile photo (data URL for MVP)
-  idDocUrl           String? // uploaded ID proof (data URL, admin-only)
+  idDocUrl           String? // uploaded ID proof — front (data URL: image or PDF, admin-only)
+  idDocBackUrl       String? // ID proof — back side (Aadhaar etc.)
   idDocType          String? // e.g. Aadhaar / PAN / Driving License
   verificationNote   String? // admin's note (e.g. rejection reason)
   available          Boolean            @default(true)

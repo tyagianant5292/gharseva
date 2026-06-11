@@ -36,6 +36,7 @@ export async function GET(req: Request) {
       verificationNote: p.verificationNote,
       idDocType: p.idDocType,
       idDocUrl: p.idDocUrl,
+      idDocBackUrl: p.idDocBackUrl,
       photoUrl: p.photoUrl,
       createdAt: p.createdAt,
     })),
