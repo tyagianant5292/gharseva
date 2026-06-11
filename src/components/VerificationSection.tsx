@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { BadgeCheck, ShieldAlert, Clock, Upload, ShieldCheck, FileText, Camera } from "lucide-react";
-import { fileToUploadData, fileToResizedDataUrl, type UploadKind } from "@/lib/image";
+import { fileToUploadData, type UploadKind } from "@/lib/image";
 
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
 type Pick = { dataUrl: string; kind: UploadKind } | null;
@@ -27,19 +27,15 @@ export default function VerificationSection({
   initialStatus,
   note,
   hasIdDoc,
-  photoUrl,
 }: {
   initialStatus: Status;
   note?: string | null;
   hasIdDoc: boolean;
-  photoUrl?: string | null;
 }) {
   const [status, setStatus] = useState<Status>(initialStatus);
   const [idType, setIdType] = useState(ID_TYPES[0]);
   const [front, setFront] = useState<Pick>(null);
   const [back, setBack] = useState<Pick>(null);
-  const [photo, setPhoto] = useState<Pick>(photoUrl ? { dataUrl: photoUrl, kind: "image" } : null);
-  const [photoThumb, setPhotoThumb] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [hasDoc, setHasDoc] = useState(hasIdDoc);
@@ -55,25 +51,6 @@ export default function VerificationSection({
         return;
       }
       set(r);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not read file");
-    }
-  }
-
-  async function pickPhoto(file: File | undefined) {
-    if (!file) return;
-    setError("");
-    try {
-      if (file.type === "application/pdf") {
-        setError("Profile photo must be an image, not a PDF.");
-        return;
-      }
-      const [full, thumb] = await Promise.all([
-        fileToResizedDataUrl(file, 700, 0.72),
-        fileToResizedDataUrl(file, 96, 0.6),
-      ]);
-      setPhoto({ dataUrl: full, kind: "image" });
-      setPhotoThumb(thumb);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not read file");
     }
@@ -95,8 +72,6 @@ export default function VerificationSection({
           idDocType: idType,
           idDocUrl: front.dataUrl,
           idDocBackUrl: back?.dataUrl,
-          photoUrl: photo?.kind === "image" && photo.dataUrl.startsWith("data:") ? photo.dataUrl : undefined,
-          photoThumbUrl: photoThumb || undefined,
         }),
       });
       const d = await res.json();
@@ -194,23 +169,8 @@ export default function VerificationSection({
             )}
           </div>
 
-          <div>
-            <label className="label">Profile photo (optional)</label>
-            <input
-              type="file"
-              accept="image/*"
-              capture="user"
-              onChange={(e) => pickPhoto(e.target.files?.[0])}
-              className={fileInputCls}
-            />
-          </div>
-
-          {(front || back || photo) && (
+          {(front || back) && (
             <div className="flex flex-wrap items-center gap-3">
-              {photo?.kind === "image" && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={photo.dataUrl} alt="photo" className="h-16 w-16 rounded-full object-cover ring-1 ring-slate-200" />
-              )}
               <Preview pick={front} label="Front" />
               <Preview pick={back} label="Back" />
             </div>

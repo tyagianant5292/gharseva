@@ -6,6 +6,7 @@ import { SERVICES } from "@/lib/services";
 import VerificationSection from "./VerificationSection";
 import EmailMethodCard from "./EmailMethodCard";
 import ProfileStatusToggle from "./ProfileStatusToggle";
+import ProfilePhotoCard from "./ProfilePhotoCard";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -151,6 +152,9 @@ export default function DashboardForm() {
           </div>
         ))}
 
+      {/* Profile photo */}
+      {p && <ProfilePhotoCard initialPhoto={p.photoUrl} name={data.name} />}
+
       {/* Profile active / disabled toggle */}
       {p && <ProfileStatusToggle initial={p.available} />}
 
@@ -170,7 +174,6 @@ export default function DashboardForm() {
             initialStatus={p.verificationStatus}
             note={p.verificationNote}
             hasIdDoc={p.hasIdDoc}
-            photoUrl={p.photoUrl}
           />
         </div>
       )}
