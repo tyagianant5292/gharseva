@@ -19,6 +19,7 @@ type Detail = {
   bio?: string | null;
   photoUrl?: string | null;
   verified: boolean;
+  emailVerified: boolean;
   available: boolean;
   contact: { mobile: string; email: string | null } | null;
 };
@@ -86,6 +87,11 @@ export default function ProviderDetailPage() {
                   <BadgeCheck size={14} /> Verified
                 </span>
               )}
+              {p.emailVerified && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700 ring-1 ring-sky-200">
+                  <Mail size={12} /> Email verified
+                </span>
+              )}
             </div>
             <p className="mt-1 flex items-center gap-1 text-slate-500">
               <MapPin size={15} /> {p.locality}, {p.city} · {p.pincode}
@@ -131,9 +137,16 @@ export default function ProviderDetailPage() {
                 <Phone size={16} className="text-brand-600" /> {p.contact.mobile}
               </a>
               {p.contact.email && (
-                <a href={`mailto:${p.contact.email}`} className="flex items-center gap-2 text-slate-800 hover:text-brand-600">
-                  <Mail size={16} className="text-brand-600" /> {p.contact.email}
-                </a>
+                <div className="flex flex-wrap items-center gap-2">
+                  <a href={`mailto:${p.contact.email}`} className="flex items-center gap-2 text-slate-800 hover:text-brand-600">
+                    <Mail size={16} className="text-brand-600" /> {p.contact.email}
+                  </a>
+                  {p.emailVerified && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700 ring-1 ring-sky-200">
+                      <BadgeCheck size={12} /> verified
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           ) : (

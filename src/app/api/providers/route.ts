@@ -36,7 +36,7 @@ export async function GET(req: Request) {
       bio: true,
       photoUrl: true,
       verified: true,
-      user: { select: { name: true } },
+      user: { select: { name: true, emailVerified: true } },
     },
   });
 
@@ -53,6 +53,7 @@ export async function GET(req: Request) {
     bio: p.bio,
     photoUrl: p.photoUrl,
     verified: p.verified,
+    emailVerified: p.user.emailVerified,
   }));
 
   return NextResponse.json({ providers: result, count: result.length });

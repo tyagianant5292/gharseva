@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BadgeCheck, MapPin, Briefcase } from "lucide-react";
+import { BadgeCheck, MapPin, Briefcase, Mail } from "lucide-react";
 import { serviceLabel, serviceIcon } from "@/lib/services";
 
 export type ProviderListItem = {
@@ -15,6 +15,7 @@ export type ProviderListItem = {
   bio?: string | null;
   photoUrl?: string | null;
   verified: boolean;
+  emailVerified: boolean;
 };
 
 function initials(name: string) {
@@ -35,11 +36,19 @@ export default function ProviderCard({ p }: { p: ProviderListItem }) {
           {initials(p.name)}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <h3 className="truncate font-semibold text-slate-900">{p.name}</h3>
             {p.verified && (
               <span className="badge-verified">
                 <BadgeCheck size={13} /> Verified
+              </span>
+            )}
+            {p.emailVerified && (
+              <span
+                title="Email verified"
+                className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-1.5 py-0.5 text-xs font-semibold text-sky-700 ring-1 ring-sky-200"
+              >
+                <Mail size={11} /> Email
               </span>
             )}
           </div>

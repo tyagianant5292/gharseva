@@ -12,7 +12,7 @@ export async function GET(
 
   const p = await prisma.providerProfile.findUnique({
     where: { id },
-    include: { user: { select: { name: true, mobile: true, email: true } } },
+    include: { user: { select: { name: true, mobile: true, email: true, emailVerified: true } } },
   });
   if (!p) return NextResponse.json({ error: "Provider not found" }, { status: 404 });
 
@@ -45,6 +45,7 @@ export async function GET(
       photoUrl: p.photoUrl,
       verificationStatus: p.verificationStatus,
       verified: p.verified,
+      emailVerified: p.user.emailVerified,
       available: p.available,
       // Gated contact:
       contact: canSeeContact ? { mobile: p.user.mobile, email: p.user.email } : null,
