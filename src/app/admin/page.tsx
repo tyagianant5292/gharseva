@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { isAdmin } from "@/lib/admin";
-import AdminPanel from "@/components/AdminPanel";
+import AdminConsole from "@/components/AdminConsole";
 
 export const metadata = { title: "Admin — GharSeva" };
 
@@ -16,5 +16,5 @@ export default async function AdminPage() {
       </div>
     );
   }
-  return <AdminPanel />;
+  return <AdminConsole />;
 }

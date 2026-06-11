@@ -98,11 +98,10 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="container-x py-8">
-      <h1 className="text-2xl font-bold text-slate-900">Admin · Verification</h1>
-      <p className="mt-1 text-slate-500">Review provider documents and approve or reject.</p>
+    <div>
+      <p className="text-sm text-slate-500">Review helper documents and manage their profiles.</p>
 
-      <div className="mt-5 flex gap-1 rounded-lg bg-slate-100 p-1">
+      <div className="mt-4 flex gap-1 rounded-lg bg-slate-100 p-1">
         {TABS.map((t) => (
           <button
             key={t}
