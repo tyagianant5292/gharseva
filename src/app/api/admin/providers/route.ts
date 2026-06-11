@@ -31,6 +31,7 @@ export async function GET(req: Request) {
       locality: p.locality,
       pincode: p.pincode,
       experienceYears: p.experienceYears,
+      available: p.available,
       verified: p.verified,
       verificationStatus: p.verificationStatus,
       verificationNote: p.verificationNote,

@@ -5,6 +5,7 @@ import { BadgeCheck, Save, Eye, Users, ShieldAlert, Clock } from "lucide-react";
 import { SERVICES } from "@/lib/services";
 import VerificationSection from "./VerificationSection";
 import EmailMethodCard from "./EmailMethodCard";
+import ProfileStatusToggle from "./ProfileStatusToggle";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -49,7 +50,6 @@ function timeAgo(iso: string): string {
 export default function DashboardForm() {
   const [data, setData] = useState<Profile | null>(null);
   const [services, setServices] = useState<string[]>([]);
-  const [available, setAvailable] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -59,7 +59,6 @@ export default function DashboardForm() {
       const d: Profile = await res.json();
       setData(d);
       setServices(d.provider?.services || []);
-      setAvailable(d.provider?.available ?? true);
     })();
   }, []);
 
@@ -86,7 +85,6 @@ export default function DashboardForm() {
           experienceYears: f.get("experienceYears") || 0,
           expectedSalary: f.get("expectedSalary") || undefined,
           bio: f.get("bio") || undefined,
-          available,
         }),
       });
       const d = await res.json();
@@ -152,6 +150,9 @@ export default function DashboardForm() {
             </p>
           </div>
         ))}
+
+      {/* Profile active / disabled toggle */}
+      {p && <ProfileStatusToggle initial={p.available} />}
 
       {/* Verification — two ways: email and/or documents */}
       {p && (
@@ -277,11 +278,6 @@ export default function DashboardForm() {
           <label className="label">About</label>
           <textarea name="bio" rows={3} defaultValue={p?.bio || ""} className="input" />
         </div>
-
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-          <input type="checkbox" checked={available} onChange={(e) => setAvailable(e.target.checked)} />
-          I&apos;m currently available for work
-        </label>
 
         {msg && <p className={`text-sm ${msg.ok ? "text-teal-600" : "text-red-600"}`}>{msg.text}</p>}
 

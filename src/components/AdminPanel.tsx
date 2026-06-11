@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { BadgeCheck, Check, X, Clock, Phone, Mail, MapPin } from "lucide-react";
+import { BadgeCheck, Check, X, Clock, Phone, Mail, MapPin, Power, Trash2, EyeOff } from "lucide-react";
 import { serviceLabel } from "@/lib/services";
 
 type Row = {
@@ -14,6 +14,7 @@ type Row = {
   locality: string;
   pincode: string;
   experienceYears: number;
+  available: boolean;
   verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
   verificationNote: string | null;
   idDocType: string | null;
@@ -73,7 +74,7 @@ export default function AdminPanel() {
     load();
   }, [load]);
 
-  async function act(id: string, action: "approve" | "reject") {
+  async function act(id: string, action: "approve" | "reject" | "enable" | "disable") {
     let note: string | undefined;
     if (action === "reject") {
       note = window.prompt("Reason for rejection (shown to the provider):") || undefined;
@@ -84,6 +85,14 @@ export default function AdminPanel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action, note }),
     });
+    setActing(null);
+    load();
+  }
+
+  async function del(id: string, name: string) {
+    if (!window.confirm(`Delete ${name}'s account permanently? This cannot be undone.`)) return;
+    setActing(id);
+    await fetch(`/api/admin/providers/${id}`, { method: "DELETE" });
     setActing(null);
     load();
   }
@@ -131,9 +140,14 @@ export default function AdminPanel() {
                     </div>
                   )}
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold text-slate-900">{r.name}</h3>
                       <StatusPill status={r.verificationStatus} />
+                      {!r.available && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500 ring-1 ring-slate-200">
+                          <EyeOff size={12} /> Disabled
+                        </span>
+                      )}
                     </div>
                     <p className="mt-0.5 flex items-center gap-1 text-sm text-slate-500">
                       <MapPin size={12} /> {r.locality}, {r.city} · {r.pincode}
@@ -171,6 +185,20 @@ export default function AdminPanel() {
                       className="btn border border-red-200 bg-red-50 px-3 py-1.5 text-red-700 hover:bg-red-100 disabled:opacity-50"
                     >
                       <X size={15} /> Reject
+                    </button>
+                    <button
+                      onClick={() => act(r.id, r.available ? "disable" : "enable")}
+                      disabled={acting === r.id}
+                      className="btn border border-slate-300 bg-white px-3 py-1.5 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      <Power size={15} /> {r.available ? "Disable" : "Enable"}
+                    </button>
+                    <button
+                      onClick={() => del(r.id, r.name)}
+                      disabled={acting === r.id}
+                      className="btn px-3 py-1.5 text-red-600 hover:bg-red-50 disabled:opacity-50"
+                    >
+                      <Trash2 size={15} /> Delete
                     </button>
                   </div>
                 </div>

@@ -92,8 +92,8 @@ export async function PUT(req: Request) {
       experienceYears: d.experienceYears,
       expectedSalary: d.expectedSalary ?? null,
       bio: d.bio || null,
-      available: d.available ?? true,
-      // Verification is NOT changed here — it's controlled by admin approval.
+      // 'available' is controlled by the dedicated toggle, not this form.
+      // Verification is controlled by admin approval.
     },
   });
 

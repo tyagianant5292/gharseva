@@ -56,7 +56,6 @@ export const profileSchema = z.object({
   experienceYears: z.coerce.number().int().min(0).max(60),
   expectedSalary: z.coerce.number().int().min(0).max(1_000_000).optional(),
   bio: z.string().trim().max(1000).optional(),
-  available: z.boolean().optional(),
   mobile,
 });
 
