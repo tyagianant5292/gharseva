@@ -13,6 +13,7 @@ import LocationPicker from "./LocationPicker";
 import LocationFields, { type LocationValue } from "./LocationFields";
 import PhoneInput from "./PhoneInput";
 import InstantAvailabilityField from "./InstantAvailabilityField";
+import OtherServiceFields from "./OtherServiceFields";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -36,6 +37,8 @@ type Profile = {
     instantAvailable: boolean;
     dailyRate: number | null;
     instantRates: Record<string, number> | null;
+    otherService: string | null;
+    otherServiceDesc: string | null;
     bio: string | null;
     available: boolean;
     lat: number | null;
@@ -66,6 +69,8 @@ export default function DashboardForm() {
   const [country, setCountry] = useState<"IN" | "AE">("IN");
   const [workMode, setWorkMode] = useState<"monthly" | "daily" | "both">("monthly");
   const [instantRates, setInstantRates] = useState<Record<string, number>>({});
+  const [otherService, setOtherService] = useState("");
+  const [otherServiceDesc, setOtherServiceDesc] = useState("");
   const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -81,6 +86,8 @@ export default function DashboardForm() {
         setCountry(d.provider.country === "AE" ? "AE" : "IN");
         setLoc({ city: d.provider.city, locality: d.provider.locality, pincode: d.provider.pincode });
         setInstantRates(d.provider.instantRates || {});
+        setOtherService(d.provider.otherService || "");
+        setOtherServiceDesc(d.provider.otherServiceDesc || "");
         // services now holds MONTHLY services; instant services live in instantRates.
         const hasMonthly = (d.provider.services?.length ?? 0) > 0 || d.provider.expectedSalary != null;
         setWorkMode(
@@ -115,6 +122,8 @@ export default function DashboardForm() {
           expectedSalary: workMode === "daily" ? undefined : f.get("expectedSalary") || undefined,
           instantAvailable: workMode !== "monthly",
           instantRates: workMode !== "monthly" ? instantRates : undefined,
+          otherService: otherService || undefined,
+          otherServiceDesc: otherServiceDesc || undefined,
           bio: f.get("bio") || undefined,
         }),
       });
@@ -419,6 +428,11 @@ export default function DashboardForm() {
                     onChange={setInstantRates}
                     currency={isUAE ? "AED" : "₹"}
                   />
+                )}
+
+                {((workMode !== "daily" && services.includes("OTHER")) ||
+                  (workMode !== "monthly" && "OTHER" in instantRates)) && (
+                  <OtherServiceFields name={otherService} setName={setOtherService} desc={otherServiceDesc} setDesc={setOtherServiceDesc} />
                 )}
 
                 <div>

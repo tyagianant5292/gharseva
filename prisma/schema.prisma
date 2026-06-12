@@ -61,6 +61,8 @@ model ProviderProfile {
   instantAvailable   Boolean            @default(false) // offers daily / short-term bookings
   dailyRate          Int? // denormalized "from" price = min of instantRates (display/sort)
   instantRates       Json? // per-service daily rates, e.g. { "COOK": 500, "MAID": 300 }
+  otherService       String? // custom service name when "OTHER" is offered
+  otherServiceDesc   String? // description of the custom "OTHER" service
   bio                String?
   photoUrl           String? // profile photo (data URL for MVP)
   photoThumbUrl      String? // tiny thumbnail for list cards

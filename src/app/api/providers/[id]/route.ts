@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { asRates } from "@/lib/instant";
 
 // Provider detail. The phone/email is only revealed to a logged-in user, and the
 // reveal is recorded as a ContactView (lead).
@@ -60,6 +61,9 @@ export async function GET(
       expectedSalary: p.expectedSalary,
       instantAvailable: p.instantAvailable,
       dailyRate: p.dailyRate,
+      instantRates: asRates(p.instantRates),
+      otherService: p.otherService,
+      otherServiceDesc: p.otherServiceDesc,
       bio: p.bio,
       photoUrl: p.photoUrl,
       verificationStatus: p.verificationStatus,

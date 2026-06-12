@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, Zap, MapPin, BadgeCheck, CalendarDays } from "lucide-react";
-import { SERVICES, serviceLabel, serviceIcon } from "@/lib/services";
+import { SERVICES, displayService, serviceIcon } from "@/lib/services";
 import { formatMoney } from "@/lib/money";
 import CityAutocomplete from "./CityAutocomplete";
 import Stars from "./Stars";
@@ -12,6 +12,7 @@ type Item = {
   id: string;
   name: string;
   services: string[];
+  otherService?: string | null;
   country?: string | null;
   city: string;
   locality: string;
@@ -184,7 +185,7 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
 
       <div className="mt-3 flex flex-wrap gap-1.5">
         {instantServices.slice(0, 5).map((s) => (
-          <span key={s} className="chip">{serviceIcon(s)} {serviceLabel(s)}</span>
+          <span key={s} className="chip">{serviceIcon(s)} {displayService(s, p.otherService)}</span>
         ))}
       </div>
 
@@ -203,7 +204,7 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
             <label className="label">Service</label>
             <select value={svc} onChange={(e) => setSvc(e.target.value)} className="input">
               {instantServices.map((s) => (
-                <option key={s} value={s}>{serviceLabel(s)} — {formatMoney(rates[s], p.country)}/day</option>
+                <option key={s} value={s}>{displayService(s, p.otherService)} — {formatMoney(rates[s], p.country)}/day</option>
               ))}
             </select>
           </div>

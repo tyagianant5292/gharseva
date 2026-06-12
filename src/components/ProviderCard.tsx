@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BadgeCheck, MapPin, Briefcase, Mail } from "lucide-react";
-import { serviceLabel, serviceIcon } from "@/lib/services";
+import { displayService, serviceIcon } from "@/lib/services";
 import { formatMoney } from "@/lib/money";
 import Stars from "./Stars";
 
@@ -8,6 +8,7 @@ export type ProviderListItem = {
   id: string;
   name: string;
   services: string[];
+  otherService?: string | null;
   country?: string | null;
   city: string;
   locality: string;
@@ -88,7 +89,7 @@ export default function ProviderCard({ p }: { p: ProviderListItem }) {
       <div className="mt-3 flex flex-wrap gap-1.5">
         {p.services.slice(0, 4).map((s) => (
           <span key={s} className="chip">
-            {serviceIcon(s)} {serviceLabel(s)}
+            {serviceIcon(s)} {displayService(s, p.otherService)}
           </span>
         ))}
       </div>

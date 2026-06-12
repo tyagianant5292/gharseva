@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { BadgeCheck, MapPin, Briefcase, Phone, Mail, Lock, ArrowLeft, Zap, CalendarDays } from "lucide-react";
-import { serviceLabel, serviceIcon } from "@/lib/services";
+import { displayService, serviceIcon } from "@/lib/services";
 import { formatMoney } from "@/lib/money";
 import Stars from "@/components/Stars";
 import ReviewsSection, { type Review } from "@/components/ReviewsSection";
@@ -25,6 +25,8 @@ type Detail = {
   expectedSalary?: number | null;
   instantAvailable?: boolean;
   dailyRate?: number | null;
+  otherService?: string | null;
+  otherServiceDesc?: string | null;
   bio?: string | null;
   photoUrl?: string | null;
   verified: boolean;
@@ -131,10 +133,15 @@ export default function ProviderDetailPage() {
           <div className="mt-2 flex flex-wrap gap-2">
             {p.services.map((s) => (
               <span key={s} className="chip text-sm">
-                {serviceIcon(s)} {serviceLabel(s)}
+                {serviceIcon(s)} {displayService(s, p.otherService)}
               </span>
             ))}
           </div>
+          {p.otherService && p.otherServiceDesc && (
+            <p className="mt-2 text-sm text-slate-600">
+              <span className="font-medium text-slate-700">✨ {p.otherService}:</span> {p.otherServiceDesc}
+            </p>
+          )}
         </div>
 
         {p.expectedSalary ? (
@@ -210,6 +217,7 @@ export default function ProviderDetailPage() {
           providerId={p.id}
           providerName={p.name}
           services={p.services}
+          otherService={p.otherService}
           canRequest={canReview}
           loggedIn={canSee}
           initialRequest={myRequest}

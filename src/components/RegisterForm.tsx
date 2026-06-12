@@ -7,6 +7,7 @@ import { SERVICES } from "@/lib/services";
 import LocationFields, { type LocationValue } from "./LocationFields";
 import PhoneInput from "./PhoneInput";
 import InstantAvailabilityField from "./InstantAvailabilityField";
+import OtherServiceFields from "./OtherServiceFields";
 
 type Role = "CUSTOMER" | "PROVIDER";
 
@@ -19,6 +20,8 @@ export default function RegisterForm() {
   const [country, setCountry] = useState<"IN" | "AE">("IN");
   const [workMode, setWorkMode] = useState<"monthly" | "daily" | "both">("monthly");
   const [instantRates, setInstantRates] = useState<Record<string, number>>({});
+  const [otherService, setOtherService] = useState("");
+  const [otherServiceDesc, setOtherServiceDesc] = useState("");
   const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -51,6 +54,8 @@ export default function RegisterForm() {
         expectedSalary: workMode === "daily" ? undefined : f.get("expectedSalary") || undefined,
         instantAvailable: workMode !== "monthly",
         instantRates: workMode !== "monthly" ? instantRates : undefined,
+        otherService: otherService || undefined,
+        otherServiceDesc: otherServiceDesc || undefined,
         bio: f.get("bio") || undefined,
       });
     }
@@ -224,6 +229,12 @@ export default function RegisterForm() {
                   currency={country === "AE" ? "AED" : "₹"}
                 />
               )}
+
+              {((workMode !== "daily" && services.includes("OTHER")) ||
+                (workMode !== "monthly" && "OTHER" in instantRates)) && (
+                <OtherServiceFields name={otherService} setName={setOtherService} desc={otherServiceDesc} setDesc={setOtherServiceDesc} />
+              )}
+
               <div>
                 <label className="label">About you (optional)</label>
                 <textarea name="bio" rows={3} className="input" placeholder="Languages, timings, what you specialise in…" />

@@ -53,6 +53,8 @@ export async function GET() {
           instantAvailable: p.instantAvailable,
           dailyRate: p.dailyRate,
           instantRates: asRates(p.instantRates),
+          otherService: p.otherService,
+          otherServiceDesc: p.otherServiceDesc,
           bio: p.bio,
           available: p.available,
           verified: p.verified,
@@ -89,10 +91,13 @@ export async function PUT(req: Request) {
 
   const rates = cleanInstantRates(d.instantRates);
   const hasInstant = Boolean(d.instantAvailable) && Object.keys(rates).length > 0;
+  const offersOther = Boolean(d.services?.includes("OTHER")) || "OTHER" in rates;
 
   // A provider must offer at least one service — monthly or daily.
   if ((d.services?.length ?? 0) === 0 && !hasInstant)
     return NextResponse.json({ error: "Select at least one service" }, { status: 400 });
+  if (offersOther && !d.otherService)
+    return NextResponse.json({ error: "Please name your other service" }, { status: 400 });
 
   // Re-derive the map pin from the stated area when the location changes (or is
   // missing) so "near me" stays accurate even if a stale GPS pin was set elsewhere.
@@ -124,6 +129,8 @@ export async function PUT(req: Request) {
       dailyRate: hasInstant ? minRate(rates) : null,
       instantRates: hasInstant ? rates : Prisma.JsonNull,
       ...(geo ? { lat: geo.lat, lng: geo.lng } : {}),
+      otherService: offersOther ? d.otherService || null : null,
+      otherServiceDesc: offersOther ? d.otherServiceDesc || null : null,
       bio: d.bio || null,
       // 'available' is controlled by the dedicated toggle, not this form.
       // Verification is controlled by admin approval.

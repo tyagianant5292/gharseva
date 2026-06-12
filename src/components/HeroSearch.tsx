@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { SERVICES } from "@/lib/services";
+import CityAutocomplete from "./CityAutocomplete";
 
 export default function HeroSearch() {
   const router = useRouter();
@@ -33,12 +34,7 @@ export default function HeroSearch() {
           </option>
         ))}
       </select>
-      <input
-        className="input"
-        placeholder="City (e.g. Noida)"
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-      />
+      <CityAutocomplete value={city} onChange={setCity} placeholder="City (e.g. Noida)" />
       <input
         className="input"
         placeholder="Pincode"

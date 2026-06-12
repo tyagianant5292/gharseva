@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CalendarCheck, Clock, Check, X } from "lucide-react";
-import { serviceLabel } from "@/lib/services";
+import { displayService } from "@/lib/services";
 
 type Status = "PENDING" | "ACCEPTED" | "DECLINED";
 type MyRequest = { status: Status; service: string | null; message: string | null; preferredTime: string | null; responseNote?: string | null };
@@ -12,6 +12,7 @@ export default function RequestHelperButton({
   providerId,
   providerName,
   services,
+  otherService,
   canRequest,
   loggedIn,
   initialRequest,
@@ -20,6 +21,7 @@ export default function RequestHelperButton({
   providerId: string;
   providerName: string;
   services: string[];
+  otherService?: string | null;
   canRequest: boolean;
   loggedIn: boolean;
   initialRequest: MyRequest | null;
@@ -97,7 +99,7 @@ export default function RequestHelperButton({
               <select value={service} onChange={(e) => setService(e.target.value)} className="input">
                 {services.map((s) => (
                   <option key={s} value={s}>
-                    {serviceLabel(s)}
+                    {displayService(s, otherService)}
                   </option>
                 ))}
               </select>

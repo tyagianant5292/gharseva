@@ -29,6 +29,8 @@ export const registerSchema = z
     expectedSalary: z.coerce.number().int().min(0).max(1_000_000).optional(),
     instantAvailable: z.coerce.boolean().optional(),
     instantRates: z.record(z.coerce.number().int().min(1).max(100_000)).optional(),
+    otherService: z.string().trim().max(60).optional(),
+    otherServiceDesc: z.string().trim().max(300).optional(),
     bio: z.string().trim().max(1000).optional(),
   })
   .superRefine((data, ctx) => {
@@ -37,6 +39,10 @@ export const registerSchema = z
       const hasInstant = data.instantRates && Object.keys(data.instantRates).length > 0;
       if ((!data.services || data.services.length === 0) && !hasInstant)
         ctx.addIssue({ code: "custom", path: ["services"], message: "Select at least one service" });
+      // Naming required when "Other" is offered (monthly or daily).
+      const offersOther = data.services?.includes("OTHER") || (data.instantRates && "OTHER" in data.instantRates);
+      if (offersOther && !data.otherService)
+        ctx.addIssue({ code: "custom", path: ["otherService"], message: "Please name your other service" });
       if (!data.city)
         ctx.addIssue({ code: "custom", path: ["city"], message: "City is required" });
       if (!data.locality)
@@ -68,6 +74,8 @@ export const profileSchema = z.object({
   expectedSalary: z.coerce.number().int().min(0).max(1_000_000).optional(),
   instantAvailable: z.coerce.boolean().optional(),
   instantRates: z.record(z.coerce.number().int().min(1).max(100_000)).optional(),
+  otherService: z.string().trim().max(60).optional(),
+  otherServiceDesc: z.string().trim().max(300).optional(),
   bio: z.string().trim().max(1000).optional(),
   mobile,
 });

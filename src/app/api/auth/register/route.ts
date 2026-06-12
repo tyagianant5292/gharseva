@@ -35,6 +35,7 @@ export async function POST(req: Request) {
   // Per-service daily rates — chosen independently of monthly services.
   const rates = cleanInstantRates(d.instantRates);
   const hasInstant = Boolean(d.instantAvailable) && Object.keys(rates).length > 0;
+  const offersOther = Boolean(d.services?.includes("OTHER")) || "OTHER" in rates;
 
   // Derive the map pin from the stated area so "near me" search is accurate.
   const geo =
@@ -68,6 +69,8 @@ export async function POST(req: Request) {
                 instantRates: hasInstant ? rates : Prisma.JsonNull,
                 lat: geo?.lat ?? null,
                 lng: geo?.lng ?? null,
+                otherService: offersOther ? d.otherService || null : null,
+                otherServiceDesc: offersOther ? d.otherServiceDesc || null : null,
                 bio: d.bio || null,
                 // Starts unverified — provider uploads ID, admin approves.
                 verified: false,
