@@ -14,6 +14,7 @@ export default function RegisterForm() {
   const next = sp.get("next") || "";
   const [role, setRole] = useState<Role>((sp.get("role") as Role) === "PROVIDER" ? "PROVIDER" : "CUSTOMER");
   const [services, setServices] = useState<string[]>([]);
+  const [country, setCountry] = useState<"IN" | "AE">("IN");
   const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -37,6 +38,7 @@ export default function RegisterForm() {
     if (role === "PROVIDER") {
       Object.assign(payload, {
         services,
+        country,
         city: loc.city,
         locality: loc.locality,
         pincode: loc.pincode,
@@ -113,6 +115,31 @@ export default function RegisterForm() {
           {role === "PROVIDER" && (
             <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
               <div>
+                <label className="label">Country</label>
+                <div className="grid grid-cols-2 gap-2 rounded-lg bg-white p-1 ring-1 ring-slate-200">
+                  {([["IN", "🇮🇳 India"], ["AE", "🇦🇪 UAE"]] as const).map(([c, lbl]) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => {
+                        setCountry(c);
+                        setLoc({ city: "", locality: "", pincode: "" });
+                      }}
+                      className={`rounded-md py-1.5 text-sm font-semibold transition-colors ${
+                        country === c ? "bg-brand-600 text-white" : "text-slate-500"
+                      }`}
+                    >
+                      {lbl}
+                    </button>
+                  ))}
+                </div>
+                {country === "AE" && (
+                  <p className="mt-1.5 text-xs text-slate-500">
+                    In the UAE, verifying your <span className="font-medium">email</span> earns the Verified badge — no ID documents needed.
+                  </p>
+                )}
+              </div>
+              <div>
                 <label className="label">Services you offer</label>
                 <div className="flex flex-wrap gap-2">
                   {SERVICES.map((s) => (
@@ -131,7 +158,7 @@ export default function RegisterForm() {
                   ))}
                 </div>
               </div>
-              <LocationFields value={loc} onChange={setLoc} />
+              <LocationFields value={loc} onChange={setLoc} country={country} />
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
                   <label className="label">Gender</label>
@@ -147,8 +174,8 @@ export default function RegisterForm() {
                   <input name="experienceYears" type="number" min={0} defaultValue={0} className="input" />
                 </div>
                 <div>
-                  <label className="label">Expected ₹/month</label>
-                  <input name="expectedSalary" type="number" min={0} className="input" placeholder="e.g. 8000" />
+                  <label className="label">Expected {country === "AE" ? "AED" : "₹"}/month</label>
+                  <input name="expectedSalary" type="number" min={0} className="input" placeholder={country === "AE" ? "e.g. 1500" : "e.g. 8000"} />
                 </div>
               </div>
               <div>

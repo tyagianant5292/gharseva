@@ -39,6 +39,7 @@ export async function GET(req: Request) {
     select: {
       id: true,
       services: true,
+      country: true,
       city: true,
       locality: true,
       pincode: true,
@@ -60,6 +61,7 @@ export async function GET(req: Request) {
     id: p.id,
     name: p.user.name,
     services: p.services,
+    country: p.country,
     city: p.city,
     locality: p.locality,
     pincode: p.pincode,

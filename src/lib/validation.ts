@@ -20,6 +20,7 @@ export const registerSchema = z
     role: z.enum(["CUSTOMER", "PROVIDER"]),
     // Provider-only fields (required when role === PROVIDER, validated below)
     services: z.array(z.enum(SERVICE_KEYS as [string, ...string[]])).optional(),
+    country: z.enum(["IN", "AE"]).optional(),
     city: z.string().trim().max(80).optional(),
     locality: z.string().trim().max(120).optional(),
     pincode: z.string().trim().optional(),
@@ -36,7 +37,8 @@ export const registerSchema = z
         ctx.addIssue({ code: "custom", path: ["city"], message: "City is required" });
       if (!data.locality)
         ctx.addIssue({ code: "custom", path: ["locality"], message: "Locality is required" });
-      if (!data.pincode || !/^[0-9]{4,8}$/.test(data.pincode))
+      // Pincode is required only in India — the UAE doesn't use postal codes.
+      if (data.country !== "AE" && (!data.pincode || !/^[0-9]{4,8}$/.test(data.pincode)))
         ctx.addIssue({ code: "custom", path: ["pincode"], message: "Enter a valid pincode" });
     }
   });
@@ -49,9 +51,13 @@ export const loginSchema = z.object({
 
 export const profileSchema = z.object({
   services: z.array(z.enum(SERVICE_KEYS as [string, ...string[]])).min(1, "Select at least one service"),
+  country: z.enum(["IN", "AE"]).optional(),
   city: z.string().trim().min(1, "City is required").max(80),
   locality: z.string().trim().min(1, "Locality is required").max(120),
-  pincode: z.string().trim().regex(/^[0-9]{4,8}$/, "Enter a valid pincode"),
+  // Optional — required in India (form-enforced); the UAE has no pincodes.
+  pincode: z
+    .union([z.string().trim().regex(/^[0-9]{4,8}$/, "Enter a valid pincode"), z.literal("")])
+    .optional(),
   gender: z.string().trim().optional(),
   experienceYears: z.coerce.number().int().min(0).max(60),
   expectedSalary: z.coerce.number().int().min(0).max(1_000_000).optional(),

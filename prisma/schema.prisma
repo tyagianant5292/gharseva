@@ -48,6 +48,7 @@ model ProviderProfile {
   userId             String             @unique
   user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   services           String[] // e.g. ["MAID", "COOK"]
+  country            String             @default("IN") // "IN" (India) | "AE" (UAE)
   city               String
   locality           String
   pincode            String

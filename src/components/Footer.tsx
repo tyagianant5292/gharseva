@@ -7,12 +7,18 @@ export default function Footer() {
         <p>
           © {new Date().getFullYear()} <span className="font-semibold text-slate-700">GharSeva</span> — trusted home helpers near you.
         </p>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <Link href="/providers" className="hover:text-brand-600">
             Find Helpers
           </Link>
           <Link href="/register?role=PROVIDER" className="hover:text-brand-600">
             Become a Helper
+          </Link>
+          <Link href="/privacy" className="hover:text-brand-600">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:text-brand-600">
+            Terms
           </Link>
         </div>
       </div>

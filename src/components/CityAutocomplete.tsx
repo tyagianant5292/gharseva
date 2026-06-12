@@ -1,25 +1,30 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CITIES } from "@/lib/cities";
+import { CITIES, citiesFor } from "@/lib/cities";
 
 export default function CityAutocomplete({
   value,
   onChange,
   placeholder = "City",
   disabled,
+  country,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  country?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // With an explicit country, suggest that country's cities; otherwise (e.g. on the
+  // public search) suggest from both India and the UAE.
+  const list = country ? citiesFor(country) : CITIES;
   const q = value.trim().toLowerCase();
   const matches = q
-    ? CITIES.filter((c) => c.toLowerCase().includes(q))
+    ? list.filter((c) => c.toLowerCase().includes(q))
         .sort((a, b) => (a.toLowerCase().startsWith(q) ? -1 : 1) - (b.toLowerCase().startsWith(q) ? -1 : 1))
         .slice(0, 8)
     : [];

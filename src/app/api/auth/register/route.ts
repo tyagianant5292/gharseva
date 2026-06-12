@@ -43,6 +43,7 @@ export async function POST(req: Request) {
           ? {
               create: {
                 services: d.services ?? [],
+                country: d.country ?? "IN",
                 city: d.city ?? "",
                 locality: d.locality ?? "",
                 pincode: d.pincode ?? "",

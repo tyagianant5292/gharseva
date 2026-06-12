@@ -51,6 +51,7 @@ export async function GET(
       id: p.id,
       name: p.user.name,
       services: p.services,
+      country: p.country,
       city: p.city,
       locality: p.locality,
       pincode: p.pincode,

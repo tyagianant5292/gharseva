@@ -6,16 +6,20 @@ import { lookupPincode } from "@/lib/pincode";
 
 export type LocationValue = { city: string; locality: string; pincode: string };
 
-// Pincode → auto-fills city and offers area suggestions; city has autocomplete.
+// India: pincode → auto-fills city + offers area suggestions.
+// UAE: no postal codes — just City + Area, with UAE-specific city suggestions.
 export default function LocationFields({
   value,
   onChange,
+  country = "IN",
 }: {
   value: LocationValue;
   onChange: (v: LocationValue) => void;
+  country?: string | null;
 }) {
   const [areas, setAreas] = useState<string[]>([]);
   const [looking, setLooking] = useState(false);
+  const isUAE = country === "AE";
 
   async function onPincode(pincode: string) {
     onChange({ ...value, pincode });
@@ -28,6 +32,31 @@ export default function LocationFields({
         onChange({ city: info.city, pincode, locality: value.locality });
       }
     }
+  }
+
+  if (isUAE) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="label">Emirate / City</label>
+          <CityAutocomplete
+            value={value.city}
+            country="AE"
+            placeholder="Abu Dhabi"
+            onChange={(city) => onChange({ ...value, city })}
+          />
+        </div>
+        <div>
+          <label className="label">Community / Area</label>
+          <input
+            className="input"
+            placeholder="Khalifa City"
+            value={value.locality}
+            onChange={(e) => onChange({ ...value, locality: e.target.value, pincode: "" })}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -23,6 +23,7 @@ type Profile = {
   recentLeads: Lead[];
   provider: {
     services: string[];
+    country: string | null;
     city: string;
     locality: string;
     pincode: string;
@@ -56,6 +57,7 @@ function timeAgo(iso: string): string {
 export default function DashboardForm() {
   const [data, setData] = useState<Profile | null>(null);
   const [services, setServices] = useState<string[]>([]);
+  const [country, setCountry] = useState<"IN" | "AE">("IN");
   const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -67,7 +69,10 @@ export default function DashboardForm() {
       const d: Profile = await res.json();
       setData(d);
       setServices(d.provider?.services || []);
-      if (d.provider) setLoc({ city: d.provider.city, locality: d.provider.locality, pincode: d.provider.pincode });
+      if (d.provider) {
+        setCountry(d.provider.country === "AE" ? "AE" : "IN");
+        setLoc({ city: d.provider.city, locality: d.provider.locality, pincode: d.provider.pincode });
+      }
     })();
   }, []);
 
@@ -86,6 +91,7 @@ export default function DashboardForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           services,
+          country,
           mobile: f.get("mobile"),
           city: loc.city,
           locality: loc.locality,
@@ -116,11 +122,25 @@ export default function DashboardForm() {
     { key: "edit" as const, label: "Edit profile", icon: <Pencil size={16} /> },
   ];
 
+  const isUAE = country === "AE";
+
   const statusBanner = p ? (
     p.verified ? (
       <div className="mt-5 rounded-xl bg-teal-50 p-4 ring-1 ring-teal-200">
         <p className="flex items-center gap-2 font-semibold text-teal-800">
           <BadgeCheck size={18} /> Your account is verified — families can see your Verified badge.
+        </p>
+      </div>
+    ) : isUAE ? (
+      <div className="mt-5 rounded-xl bg-brand-50 p-4 ring-1 ring-brand-200">
+        <p className="text-base font-semibold text-brand-800">🎉 Welcome, {data.name}! Your account has been created.</p>
+        <p className="mt-0.5 text-sm text-brand-700">
+          {data.emailVerified
+            ? "Your email is confirmed."
+            : <>Confirm your <span className="font-semibold">email</span> to earn the <span className="font-semibold">Verified badge</span>. </>}
+          <button onClick={() => setTab("verify")} className="font-medium underline">
+            {data.emailVerified ? "View verification →" : "Verify email →"}
+          </button>
         </p>
       </div>
     ) : p.verificationStatus === "REJECTED" ? (
@@ -248,17 +268,26 @@ export default function DashboardForm() {
             <div>
               <h1 className="text-xl font-bold text-slate-900">Get verified</h1>
               <p className="mt-0.5 text-sm text-slate-500">
-                Email confirmation is a light trust signal; the admin document check gives the trusted Verified badge.
+                {isUAE
+                  ? "In the UAE, confirming your email earns the Verified badge — we don't collect ID documents."
+                  : "Email confirmation is a light trust signal; the admin document check gives the trusted Verified badge."}
               </p>
               <div className="mt-4">
                 <EmailMethodCard email={data.email} emailVerified={data.emailVerified} />
               </div>
-              {p && (
+              {/* Document verification is India-only; the UAE relies on email. */}
+              {p && !isUAE && (
                 <VerificationSection
                   initialStatus={p.verificationStatus}
                   note={p.verificationNote}
                   hasIdDoc={p.hasIdDoc}
                 />
+              )}
+              {isUAE && !data.email && (
+                <p className="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-800 ring-1 ring-amber-200">
+                  You don&apos;t have an email on your account yet. Add one from{" "}
+                  <a href="/account" className="font-medium underline">My Account</a> to get verified.
+                </p>
               )}
             </div>
           )}
@@ -301,7 +330,28 @@ export default function DashboardForm() {
                   </div>
                 </div>
 
-                <LocationFields value={loc} onChange={setLoc} />
+                <div>
+                  <label className="label">Country</label>
+                  <div className="grid max-w-xs grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1">
+                    {([["IN", "🇮🇳 India"], ["AE", "🇦🇪 UAE"]] as const).map(([c, lbl]) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => {
+                          setCountry(c);
+                          setLoc({ city: "", locality: "", pincode: "" });
+                        }}
+                        className={`rounded-md py-1.5 text-sm font-semibold transition-colors ${
+                          country === c ? "bg-white text-brand-700 shadow-sm" : "text-slate-500"
+                        }`}
+                      >
+                        {lbl}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <LocationFields value={loc} onChange={setLoc} country={country} />
 
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div>
@@ -318,7 +368,7 @@ export default function DashboardForm() {
                     <input name="experienceYears" type="number" min={0} defaultValue={p?.experienceYears ?? 0} className="input" />
                   </div>
                   <div>
-                    <label className="label">Expected ₹/month</label>
+                    <label className="label">Expected {isUAE ? "AED" : "₹"}/month</label>
                     <input name="expectedSalary" type="number" min={0} defaultValue={p?.expectedSalary ?? ""} className="input" />
                   </div>
                 </div>

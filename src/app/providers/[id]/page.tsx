@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { BadgeCheck, MapPin, Briefcase, Phone, Mail, Lock, ArrowLeft } from "lucide-react";
 import { serviceLabel, serviceIcon } from "@/lib/services";
+import { formatMoney } from "@/lib/money";
 import Stars from "@/components/Stars";
 import ReviewsSection, { type Review } from "@/components/ReviewsSection";
 import RequestHelperButton from "@/components/RequestHelperButton";
@@ -15,6 +16,7 @@ type Detail = {
   id: string;
   name: string;
   services: string[];
+  country?: string | null;
   city: string;
   locality: string;
   pincode: string;
@@ -107,7 +109,7 @@ export default function ProviderDetailPage() {
               )}
             </div>
             <p className="mt-1 flex items-center gap-1 text-slate-500">
-              <MapPin size={15} /> {p.locality}, {p.city} · {p.pincode}
+              <MapPin size={15} /> {p.locality}, {p.city}{p.pincode ? ` · ${p.pincode}` : ""}
             </p>
             <p className="mt-1 flex items-center gap-1 text-sm text-slate-500">
               <Briefcase size={14} /> {p.experienceYears} years experience
@@ -135,7 +137,7 @@ export default function ProviderDetailPage() {
 
         {p.expectedSalary ? (
           <p className="mt-4 text-sm text-slate-600">
-            Expected salary: <span className="font-semibold text-slate-900">₹{p.expectedSalary.toLocaleString("en-IN")}/month</span>
+            Expected salary: <span className="font-semibold text-slate-900">{formatMoney(p.expectedSalary, p.country)}/month</span>
           </p>
         ) : null}
 

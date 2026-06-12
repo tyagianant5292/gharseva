@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { BadgeCheck, MapPin, Briefcase, Mail } from "lucide-react";
 import { serviceLabel, serviceIcon } from "@/lib/services";
+import { formatMoney } from "@/lib/money";
 import Stars from "./Stars";
 
 export type ProviderListItem = {
   id: string;
   name: string;
   services: string[];
+  country?: string | null;
   city: string;
   locality: string;
   pincode: string;
@@ -68,7 +70,7 @@ export default function ProviderCard({ p }: { p: ProviderListItem }) {
             )}
           </div>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-1 text-sm text-slate-500">
-            <MapPin size={13} /> {p.locality}, {p.city} · {p.pincode}
+            <MapPin size={13} /> {p.locality}, {p.city}{p.pincode ? ` · ${p.pincode}` : ""}
             {typeof p.distanceKm === "number" && (
               <span className="ml-1 rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">
                 {p.distanceKm < 1 ? `${Math.round(p.distanceKm * 1000)} m` : `${p.distanceKm.toFixed(1)} km`} away
@@ -97,7 +99,7 @@ export default function ProviderCard({ p }: { p: ProviderListItem }) {
           {p.gender ? ` · ${p.gender}` : ""}
         </span>
         {p.expectedSalary ? (
-          <span className="font-semibold text-slate-700">₹{p.expectedSalary.toLocaleString("en-IN")}/mo</span>
+          <span className="font-semibold text-slate-700">{formatMoney(p.expectedSalary, p.country)}/mo</span>
         ) : null}
       </div>
     </Link>

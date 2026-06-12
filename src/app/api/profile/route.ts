@@ -38,6 +38,7 @@ export async function GET() {
     provider: p
       ? {
           services: p.services,
+          country: p.country,
           city: p.city,
           locality: p.locality,
           pincode: p.pincode,
@@ -87,9 +88,10 @@ export async function PUT(req: Request) {
     where: { userId: session.id },
     data: {
       services: d.services,
+      country: d.country ?? "IN",
       city: d.city,
       locality: d.locality,
-      pincode: d.pincode,
+      pincode: d.pincode ?? "",
       gender: d.gender || null,
       experienceYears: d.experienceYears,
       expectedSalary: d.expectedSalary ?? null,

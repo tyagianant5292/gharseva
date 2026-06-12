@@ -1,6 +1,20 @@
+// Cities for the UAE (emirates, major cities, and popular community/area names).
+export const CITIES_AE: string[] = [
+  "Abu Dhabi", "Dubai", "Sharjah", "Ajman", "Al Ain", "Ras Al Khaimah", "Fujairah",
+  "Umm Al Quwain", "Khor Fakkan", "Dibba Al-Fujairah", "Kalba", "Madinat Zayed",
+  "Ruwais", "Liwa Oasis", "Ghayathi",
+  // Popular Abu Dhabi / Dubai communities people search by:
+  "Khalifa City", "Mohammed Bin Zayed City", "Al Reem Island", "Yas Island",
+  "Saadiyat Island", "Mussafah", "Al Raha", "Al Bateen", "Al Khalidiyah",
+  "Al Mushrif", "Al Reef", "Masdar City", "Jumeirah", "Dubai Marina",
+  "Downtown Dubai", "Business Bay", "Deira", "Bur Dubai", "Al Barsha",
+  "Jumeirah Lakes Towers", "Jumeirah Village Circle", "Discovery Gardens",
+  "International City", "Mirdif", "Al Nahda", "Silicon Oasis",
+];
+
 // A curated list of Indian cities for search/registration autocomplete.
 // (The pincode lookup can fill in any city not listed here.)
-export const CITIES: string[] = [
+export const CITIES_IN: string[] = [
   "Mumbai", "Delhi", "New Delhi", "Bengaluru", "Hyderabad", "Ahmedabad", "Chennai", "Kolkata",
   "Pune", "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal",
   "Visakhapatnam", "Patna", "Vadodara", "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad",
@@ -24,3 +38,11 @@ export const CITIES: string[] = [
   "Haldia", "Hisar", "Yamunanagar", "Sagar", "Ratlam", "Hospet", "Ambala", "Karimnagar", "Anand",
   "Etawah", "Thoothukudi", "Rewa", "Imphal", "Anantapuram", "Catraj", "Karawal Nagar", "Shimla",
 ];
+
+// Combined list (back-compat / default).
+export const CITIES: string[] = [...CITIES_IN, ...CITIES_AE];
+
+// Returns the right city list for a country code ("IN" | "AE").
+export function citiesFor(country?: string | null): string[] {
+  return country === "AE" ? CITIES_AE : CITIES_IN;
+}
