@@ -107,12 +107,17 @@ export async function sendBookingStatusEmail(
   customerName: string,
   providerName: string,
   accepted: boolean,
+  reason?: string | null,
 ): Promise<boolean> {
   const subject = accepted ? `${providerName} accepted your request ✅` : `${providerName} declined your request`;
+  const reasonHtml =
+    !accepted && reason
+      ? `<p style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;color:#991b1b"><b>Reason:</b> ${escapeHtml(reason)}</p>`
+      : "";
   const html = `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto">
       <h2 style="color:${accepted ? "#0d9488" : "#dc2626"}">${accepted ? "Request accepted 🎉" : "Request declined"}</h2>
       <p>Hi ${escapeHtml(customerName)}, <b>${escapeHtml(providerName)}</b> has ${accepted ? "accepted" : "declined"} your booking request.</p>
-      ${accepted ? `<p>You can now contact them directly to arrange the details.</p>` : ""}
+      ${accepted ? `<p>You can now contact them directly to arrange the details.</p>` : reasonHtml}
       <p style="margin:20px 0"><a href="${SITE_URL}/requests" style="background:#ea580c;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">View my requests</a></p>
     </div>`;
   return send(to, customerName, subject, html);

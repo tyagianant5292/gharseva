@@ -4,7 +4,10 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { sendBookingStatusEmail } from "@/lib/email";
 
-const schema = z.object({ action: z.enum(["accept", "decline"]) });
+const schema = z.object({
+  action: z.enum(["accept", "decline"]),
+  reason: z.string().trim().max(500).optional(),
+});
 
 // Provider accepts or declines a booking request.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -28,15 +31,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
   const accepted = parsed.data.action === "accept";
+  const reason = parsed.data.reason || null;
   await prisma.bookingRequest.update({
     where: { id },
-    data: { status: accepted ? "ACCEPTED" : "DECLINED" },
+    data: { status: accepted ? "ACCEPTED" : "DECLINED", responseNote: reason },
   });
 
   if (reqRow.customer.email) {
-    sendBookingStatusEmail(reqRow.customer.email, reqRow.customer.name, reqRow.provider.user.name, accepted).catch(
-      () => {},
-    );
+    sendBookingStatusEmail(
+      reqRow.customer.email,
+      reqRow.customer.name,
+      reqRow.provider.user.name,
+      accepted,
+      reason,
+    ).catch(() => {});
   }
 
   return NextResponse.json({ ok: true, status: accepted ? "ACCEPTED" : "DECLINED" });

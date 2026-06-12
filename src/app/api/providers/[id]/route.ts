@@ -42,7 +42,7 @@ export async function GET(
   const myRequest = session
     ? await prisma.bookingRequest.findUnique({
         where: { customerId_providerId: { customerId: session.id, providerId: p.id } },
-        select: { status: true, service: true, message: true, preferredTime: true },
+        select: { status: true, service: true, message: true, preferredTime: true, responseNote: true },
       })
     : null;
 

@@ -16,6 +16,7 @@ type Req = {
   message: string | null;
   preferredTime: string | null;
   status: Status;
+  responseNote: string | null;
   createdAt: string;
 };
 
@@ -73,9 +74,16 @@ export default function MyRequests() {
                 </a>
               )}
               {r.status === "DECLINED" && (
-                <Link href={`/providers/${r.providerId}`} className="mt-2 inline-block text-sm font-medium text-brand-600 hover:underline">
-                  Send a new request →
-                </Link>
+                <>
+                  {r.responseNote && (
+                    <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-100">
+                      <span className="font-semibold">Reason:</span> {r.responseNote}
+                    </p>
+                  )}
+                  <Link href={`/providers/${r.providerId}`} className="mt-2 inline-block text-sm font-medium text-brand-600 hover:underline">
+                    Send a new request →
+                  </Link>
+                </>
               )}
             </div>
           ))}

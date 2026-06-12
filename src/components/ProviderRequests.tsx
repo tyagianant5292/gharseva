@@ -14,6 +14,7 @@ type Req = {
   message: string | null;
   preferredTime: string | null;
   status: Status;
+  responseNote: string | null;
   createdAt: string;
 };
 
@@ -21,6 +22,8 @@ export default function ProviderRequests() {
   const [rows, setRows] = useState<Req[]>([]);
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
+  const [decliningId, setDecliningId] = useState<string | null>(null);
+  const [reason, setReason] = useState("");
 
   const load = useCallback(async () => {
     const res = await fetch("/api/provider/requests");
@@ -33,14 +36,16 @@ export default function ProviderRequests() {
     load();
   }, [load]);
 
-  async function act(id: string, action: "accept" | "decline") {
+  async function act(id: string, action: "accept" | "decline", declineReason?: string) {
     setActing(id);
     await fetch(`/api/requests/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ action, reason: declineReason }),
     });
     setActing(null);
+    setDecliningId(null);
+    setReason("");
     load();
   }
 
@@ -84,17 +89,52 @@ export default function ProviderRequests() {
                   )}
                 </p>
               </div>
-              {r.status === "PENDING" && (
+              {r.status === "PENDING" && decliningId !== r.id && (
                 <div className="flex gap-2">
                   <button onClick={() => act(r.id, "accept")} disabled={acting === r.id} className="btn bg-teal-600 px-3 py-1.5 text-white hover:bg-teal-700 disabled:opacity-50">
                     <Check size={15} /> Accept
                   </button>
-                  <button onClick={() => act(r.id, "decline")} disabled={acting === r.id} className="btn border border-red-200 bg-red-50 px-3 py-1.5 text-red-700 hover:bg-red-100 disabled:opacity-50">
+                  <button onClick={() => { setDecliningId(r.id); setReason(""); }} disabled={acting === r.id} className="btn border border-red-200 bg-red-50 px-3 py-1.5 text-red-700 hover:bg-red-100 disabled:opacity-50">
                     <X size={15} /> Decline
                   </button>
                 </div>
               )}
             </div>
+
+            {/* Decline reason form */}
+            {r.status === "PENDING" && decliningId === r.id && (
+              <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3">
+                <label className="label text-red-800">Why are you declining? (the customer will see this)</label>
+                <textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  rows={2}
+                  maxLength={500}
+                  autoFocus
+                  className="input"
+                  placeholder="e.g. Already booked for those hours / location too far / not available for this service"
+                />
+                <div className="mt-2 flex gap-2">
+                  <button
+                    onClick={() => act(r.id, "decline", reason.trim() || undefined)}
+                    disabled={acting === r.id}
+                    className="btn bg-red-600 px-3 py-1.5 text-white hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {acting === r.id ? "Declining…" : "Confirm decline"}
+                  </button>
+                  <button onClick={() => { setDecliningId(null); setReason(""); }} className="btn-outline px-3 py-1.5">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Reason shown after declining */}
+            {r.status === "DECLINED" && r.responseNote && (
+              <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-100">
+                <span className="font-semibold">Your reason:</span> {r.responseNote}
+              </p>
+            )}
           </div>
         ))}
       </div>

@@ -29,6 +29,7 @@ export async function GET() {
       message: r.message,
       preferredTime: r.preferredTime,
       status: r.status,
+      responseNote: r.responseNote,
       createdAt: r.createdAt,
     })),
   });

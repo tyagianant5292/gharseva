@@ -6,7 +6,7 @@ import { CalendarCheck, Clock, Check, X } from "lucide-react";
 import { serviceLabel } from "@/lib/services";
 
 type Status = "PENDING" | "ACCEPTED" | "DECLINED";
-type MyRequest = { status: Status; service: string | null; message: string | null; preferredTime: string | null };
+type MyRequest = { status: Status; service: string | null; message: string | null; preferredTime: string | null; responseNote?: string | null };
 
 export default function RequestHelperButton({
   providerId,
@@ -71,8 +71,15 @@ export default function RequestHelperButton({
   return (
     <div>
       {initialRequest && (
-        <div className={`mb-2 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ring-1 ${statusUi[initialRequest.status].cls}`}>
-          {statusUi[initialRequest.status].icon} {statusUi[initialRequest.status].label}
+        <div className={`mb-2 rounded-lg px-3 py-2 text-sm ring-1 ${statusUi[initialRequest.status].cls}`}>
+          <div className="flex items-center gap-2 font-medium">
+            {statusUi[initialRequest.status].icon} {statusUi[initialRequest.status].label}
+          </div>
+          {initialRequest.status === "DECLINED" && initialRequest.responseNote && (
+            <p className="mt-1 pl-6">
+              <span className="font-semibold">Reason:</span> {initialRequest.responseNote}
+            </p>
+          )}
         </div>
       )}
 

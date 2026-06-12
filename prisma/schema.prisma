@@ -90,6 +90,7 @@ model BookingRequest {
   message       String?
   preferredTime String?
   status        RequestStatus   @default(PENDING)
+  responseNote  String? // provider's reason/note when declining (or accepting)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 

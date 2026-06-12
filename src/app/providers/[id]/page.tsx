@@ -10,7 +10,7 @@ import Stars from "@/components/Stars";
 import ReviewsSection, { type Review } from "@/components/ReviewsSection";
 import RequestHelperButton from "@/components/RequestHelperButton";
 
-type MyRequest = { status: "PENDING" | "ACCEPTED" | "DECLINED"; service: string | null; message: string | null; preferredTime: string | null };
+type MyRequest = { status: "PENDING" | "ACCEPTED" | "DECLINED"; service: string | null; message: string | null; preferredTime: string | null; responseNote?: string | null };
 
 type Detail = {
   id: string;
