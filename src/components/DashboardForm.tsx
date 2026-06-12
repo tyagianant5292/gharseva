@@ -35,6 +35,7 @@ type Profile = {
     expectedSalary: number | null;
     instantAvailable: boolean;
     dailyRate: number | null;
+    instantRates: Record<string, number> | null;
     bio: string | null;
     available: boolean;
     lat: number | null;
@@ -63,6 +64,8 @@ export default function DashboardForm() {
   const [data, setData] = useState<Profile | null>(null);
   const [services, setServices] = useState<string[]>([]);
   const [country, setCountry] = useState<"IN" | "AE">("IN");
+  const [workMode, setWorkMode] = useState<"monthly" | "daily" | "both">("monthly");
+  const [instantRates, setInstantRates] = useState<Record<string, number>>({});
   const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -77,6 +80,11 @@ export default function DashboardForm() {
       if (d.provider) {
         setCountry(d.provider.country === "AE" ? "AE" : "IN");
         setLoc({ city: d.provider.city, locality: d.provider.locality, pincode: d.provider.pincode });
+        setInstantRates(d.provider.instantRates || {});
+        const hasMonthly = d.provider.expectedSalary != null;
+        setWorkMode(
+          d.provider.instantAvailable ? (hasMonthly ? "both" : "daily") : "monthly",
+        );
       }
     })();
   }, []);
@@ -103,9 +111,9 @@ export default function DashboardForm() {
           pincode: loc.pincode,
           gender: f.get("gender") || undefined,
           experienceYears: f.get("experienceYears") || 0,
-          expectedSalary: f.get("expectedSalary") || undefined,
-          instantAvailable: f.get("instantAvailable") === "true",
-          dailyRate: f.get("dailyRate") || undefined,
+          expectedSalary: workMode === "daily" ? undefined : f.get("expectedSalary") || undefined,
+          instantAvailable: workMode !== "monthly",
+          instantRates: workMode !== "monthly" ? instantRates : undefined,
           bio: f.get("bio") || undefined,
         }),
       });
@@ -361,7 +369,25 @@ export default function DashboardForm() {
 
                 <LocationFields value={loc} onChange={setLoc} country={country} />
 
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label className="label">How do you want to work?</label>
+                  <div className="grid max-w-md grid-cols-3 gap-2 rounded-lg bg-slate-100 p-1">
+                    {([["monthly", "Monthly"], ["daily", "Daily / short-term"], ["both", "Both"]] as const).map(([m, lbl]) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setWorkMode(m)}
+                        className={`rounded-md py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
+                          workMode === m ? "bg-white text-brand-700 shadow-sm" : "text-slate-500"
+                        }`}
+                      >
+                        {lbl}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className="label">Gender</label>
                     <select name="gender" defaultValue={p?.gender || ""} className="input">
@@ -375,16 +401,20 @@ export default function DashboardForm() {
                     <label className="label">Experience (yrs)</label>
                     <input name="experienceYears" type="number" min={0} defaultValue={p?.experienceYears ?? 0} className="input" />
                   </div>
-                  <div>
+                </div>
+
+                {workMode !== "daily" && (
+                  <div className="sm:max-w-[220px]">
                     <label className="label">Expected {isUAE ? "AED" : "₹"}/month</label>
                     <input name="expectedSalary" type="number" min={0} defaultValue={p?.expectedSalary ?? ""} className="input" />
                   </div>
-                </div>
+                )}
 
-                {p && (
+                {workMode !== "monthly" && (
                   <InstantAvailabilityField
-                    defaultChecked={p.instantAvailable}
-                    defaultRate={p.dailyRate}
+                    services={services}
+                    rates={instantRates}
+                    onChange={setInstantRates}
                     currency={isUAE ? "AED" : "₹"}
                   />
                 )}

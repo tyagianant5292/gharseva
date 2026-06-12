@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { profileSchema } from "@/lib/validation";
+import { cleanInstantRates, minRate, asRates } from "@/lib/instant";
 
 // Returns the current provider's profile (for the dashboard).
 export async function GET() {
@@ -49,6 +51,7 @@ export async function GET() {
           expectedSalary: p.expectedSalary,
           instantAvailable: p.instantAvailable,
           dailyRate: p.dailyRate,
+          instantRates: asRates(p.instantRates),
           bio: p.bio,
           available: p.available,
           verified: p.verified,
@@ -83,6 +86,9 @@ export async function PUT(req: Request) {
   }
   const d = parsed.data;
 
+  const rates = cleanInstantRates(d.instantRates, d.services);
+  const hasInstant = Boolean(d.instantAvailable) && Object.keys(rates).length > 0;
+
   // Keep the user's mobile in sync (contact number).
   await prisma.user.update({ where: { id: session.id }, data: { mobile: d.mobile } });
 
@@ -97,8 +103,9 @@ export async function PUT(req: Request) {
       gender: d.gender || null,
       experienceYears: d.experienceYears,
       expectedSalary: d.expectedSalary ?? null,
-      instantAvailable: d.instantAvailable ?? false,
-      dailyRate: d.instantAvailable ? d.dailyRate ?? null : null,
+      instantAvailable: hasInstant,
+      dailyRate: hasInstant ? minRate(rates) : null,
+      instantRates: hasInstant ? rates : Prisma.JsonNull,
       bio: d.bio || null,
       // 'available' is controlled by the dedicated toggle, not this form.
       // Verification is controlled by admin approval.

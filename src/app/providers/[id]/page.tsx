@@ -149,7 +149,7 @@ export default function ProviderDetailPage() {
             className="mt-4 flex items-center justify-between rounded-xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200 transition-colors hover:bg-amber-100"
           >
             <span className="flex items-center gap-2 text-sm font-medium text-amber-900">
-              <Zap size={16} className="fill-amber-500 text-amber-500" /> Available for daily booking —{" "}
+              <Zap size={16} className="fill-amber-500 text-amber-500" /> Available for daily booking — from{" "}
               <span className="font-bold">{formatMoney(p.dailyRate, p.country)}/day</span>
             </span>
             <span className="flex items-center gap-1 text-sm font-semibold text-amber-700">

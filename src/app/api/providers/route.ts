@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { distanceKm, isValidLatLng } from "@/lib/geo";
+import { asRates } from "@/lib/instant";
 
 // Public provider search. Phone numbers are NEVER returned here (gated on detail).
 export async function GET(req: Request) {
@@ -52,6 +53,7 @@ export async function GET(req: Request) {
       expectedSalary: true,
       instantAvailable: true,
       dailyRate: true,
+      instantRates: true,
       bio: true,
       photoThumbUrl: true,
       verified: true,
@@ -76,6 +78,7 @@ export async function GET(req: Request) {
     expectedSalary: p.expectedSalary,
     instantAvailable: p.instantAvailable,
     dailyRate: p.dailyRate,
+    instantRates: asRates(p.instantRates),
     bio: p.bio,
     photoThumbUrl: p.photoThumbUrl,
     verified: p.verified,

@@ -59,7 +59,8 @@ model ProviderProfile {
   experienceYears    Int                @default(0)
   expectedSalary     Int? // monthly, INR
   instantAvailable   Boolean            @default(false) // offers daily / short-term bookings
-  dailyRate          Int? // per-day rate for instant bookings (provider's currency)
+  dailyRate          Int? // denormalized "from" price = min of instantRates (display/sort)
+  instantRates       Json? // per-service daily rates, e.g. { "COOK": 500, "MAID": 300 }
   bio                String?
   photoUrl           String? // profile photo (data URL for MVP)
   photoThumbUrl      String? // tiny thumbnail for list cards

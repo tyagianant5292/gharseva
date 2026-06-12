@@ -17,6 +17,8 @@ export default function RegisterForm() {
   const [role, setRole] = useState<Role>((sp.get("role") as Role) === "PROVIDER" ? "PROVIDER" : "CUSTOMER");
   const [services, setServices] = useState<string[]>([]);
   const [country, setCountry] = useState<"IN" | "AE">("IN");
+  const [workMode, setWorkMode] = useState<"monthly" | "daily" | "both">("monthly");
+  const [instantRates, setInstantRates] = useState<Record<string, number>>({});
   const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -46,9 +48,9 @@ export default function RegisterForm() {
         pincode: loc.pincode,
         gender: f.get("gender") || undefined,
         experienceYears: f.get("experienceYears") || 0,
-        expectedSalary: f.get("expectedSalary") || undefined,
-        instantAvailable: f.get("instantAvailable") === "true",
-        dailyRate: f.get("dailyRate") || undefined,
+        expectedSalary: workMode === "daily" ? undefined : f.get("expectedSalary") || undefined,
+        instantAvailable: workMode !== "monthly",
+        instantRates: workMode !== "monthly" ? instantRates : undefined,
         bio: f.get("bio") || undefined,
       });
     }
@@ -167,7 +169,29 @@ export default function RegisterForm() {
                 </div>
               </div>
               <LocationFields value={loc} onChange={setLoc} country={country} />
-              <div className="grid gap-4 sm:grid-cols-3">
+
+              <div>
+                <label className="label">How do you want to work?</label>
+                <div className="grid grid-cols-3 gap-2 rounded-lg bg-slate-100 p-1">
+                  {([["monthly", "Monthly"], ["daily", "Daily / short-term"], ["both", "Both"]] as const).map(([m, lbl]) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setWorkMode(m)}
+                      className={`rounded-md py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
+                        workMode === m ? "bg-white text-brand-700 shadow-sm" : "text-slate-500"
+                      }`}
+                    >
+                      {lbl}
+                    </button>
+                  ))}
+                </div>
+                {workMode === "daily" && (
+                  <p className="mt-1.5 text-xs text-slate-500">Great for helpers available only for short / per-day jobs.</p>
+                )}
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="label">Gender</label>
                   <select name="gender" className="input">
@@ -181,12 +205,23 @@ export default function RegisterForm() {
                   <label className="label">Experience (yrs)</label>
                   <input name="experienceYears" type="number" min={0} defaultValue={0} className="input" />
                 </div>
-                <div>
+              </div>
+
+              {workMode !== "daily" && (
+                <div className="sm:max-w-[220px]">
                   <label className="label">Expected {country === "AE" ? "AED" : "₹"}/month</label>
                   <input name="expectedSalary" type="number" min={0} className="input" placeholder={country === "AE" ? "e.g. 1500" : "e.g. 8000"} />
                 </div>
-              </div>
-              <InstantAvailabilityField currency={country === "AE" ? "AED" : "₹"} />
+              )}
+
+              {workMode !== "monthly" && (
+                <InstantAvailabilityField
+                  services={services}
+                  rates={instantRates}
+                  onChange={setInstantRates}
+                  currency={country === "AE" ? "AED" : "₹"}
+                />
+              )}
               <div>
                 <label className="label">About you (optional)</label>
                 <textarea name="bio" rows={3} className="input" placeholder="Languages, timings, what you specialise in…" />

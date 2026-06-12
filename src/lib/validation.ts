@@ -28,7 +28,7 @@ export const registerSchema = z
     experienceYears: z.coerce.number().int().min(0).max(60).optional(),
     expectedSalary: z.coerce.number().int().min(0).max(1_000_000).optional(),
     instantAvailable: z.coerce.boolean().optional(),
-    dailyRate: z.coerce.number().int().min(0).max(100_000).optional(),
+    instantRates: z.record(z.coerce.number().int().min(1).max(100_000)).optional(),
     bio: z.string().trim().max(1000).optional(),
   })
   .superRefine((data, ctx) => {
@@ -64,7 +64,7 @@ export const profileSchema = z.object({
   experienceYears: z.coerce.number().int().min(0).max(60),
   expectedSalary: z.coerce.number().int().min(0).max(1_000_000).optional(),
   instantAvailable: z.coerce.boolean().optional(),
-  dailyRate: z.coerce.number().int().min(0).max(100_000).optional(),
+  instantRates: z.record(z.coerce.number().int().min(1).max(100_000)).optional(),
   bio: z.string().trim().max(1000).optional(),
   mobile,
 });

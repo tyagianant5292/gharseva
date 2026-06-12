@@ -19,6 +19,7 @@ type Item = {
   photoThumbUrl?: string | null;
   verified: boolean;
   dailyRate?: number | null;
+  instantRates?: Record<string, number> | null;
   ratingAvg: number;
   ratingCount: number;
 };
@@ -114,7 +115,10 @@ export default function InstantBrowser() {
 }
 
 function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: () => void }) {
-  const [svc, setSvc] = useState(p.services[0] || "");
+  const rates = p.instantRates || {};
+  const instantServices = Object.keys(rates);
+  const fromRate = instantServices.length ? Math.min(...Object.values(rates)) : p.dailyRate ?? null;
+  const [svc, setSvc] = useState(instantServices[0] || "");
   const [start, setStart] = useState(todayStr());
   const [end, setEnd] = useState(todayStr());
   const [message, setMessage] = useState("");
@@ -122,9 +126,10 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
+  const rate = rates[svc] ?? 0;
   const validRange = start && end && new Date(end) >= new Date(start);
   const days = validRange ? daysBetween(start, end) : 0;
-  const total = p.dailyRate ? p.dailyRate * days : 0;
+  const total = rate * days;
 
   async function book(e: React.FormEvent) {
     e.preventDefault();
@@ -167,9 +172,10 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
           </p>
           {p.ratingCount > 0 && <div className="mt-1"><Stars avg={p.ratingAvg} count={p.ratingCount} size={13} /></div>}
         </div>
-        {p.dailyRate != null && (
+        {fromRate != null && (
           <div className="text-right">
-            <div className="font-bold text-slate-900">{formatMoney(p.dailyRate, p.country)}</div>
+            <div className="text-[10px] uppercase tracking-wide text-slate-400">from</div>
+            <div className="font-bold text-slate-900">{formatMoney(fromRate, p.country)}</div>
             <div className="text-xs text-slate-400">/ day</div>
           </div>
         )}
@@ -195,7 +201,9 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
           <div>
             <label className="label">Service</label>
             <select value={svc} onChange={(e) => setSvc(e.target.value)} className="input">
-              {p.services.map((s) => <option key={s} value={s}>{serviceLabel(s)}</option>)}
+              {instantServices.map((s) => (
+                <option key={s} value={s}>{serviceLabel(s)} — {formatMoney(rates[s], p.country)}/day</option>
+              ))}
             </select>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -213,15 +221,15 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
             <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={2} maxLength={600} className="input" placeholder="What you need, timings, address area…" />
           </div>
 
-          {validRange && p.dailyRate != null && (
+          {validRange && rate > 0 && (
             <div className="flex items-center justify-between rounded-lg bg-amber-50 px-3 py-2 text-sm ring-1 ring-amber-100">
-              <span className="text-amber-800">{days} {days === 1 ? "day" : "days"} × {formatMoney(p.dailyRate, p.country)}</span>
+              <span className="text-amber-800">{days} {days === 1 ? "day" : "days"} × {formatMoney(rate, p.country)}</span>
               <span className="font-bold text-amber-900">{formatMoney(total, p.country)}</span>
             </div>
           )}
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex gap-2">
-            <button type="submit" disabled={busy || !validRange} className="btn-primary justify-center disabled:opacity-50">
+            <button type="submit" disabled={busy || !validRange || rate <= 0} className="btn-primary justify-center disabled:opacity-50">
               {busy ? "Sending…" : "Send booking request"}
             </button>
             <button type="button" onClick={onToggle} className="btn-outline">Cancel</button>

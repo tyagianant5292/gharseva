@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { hashPassword, createSession } from "@/lib/auth";
 import { registerSchema } from "@/lib/validation";
 import { newToken, sendVerificationEmail } from "@/lib/email";
+import { cleanInstantRates, minRate } from "@/lib/instant";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -29,6 +31,10 @@ export async function POST(req: Request) {
   const passwordHash = await hashPassword(d.password);
   const verifyToken = d.email ? newToken() : null;
 
+  // Per-service daily rates (only kept for services they offer, rate > 0).
+  const rates = cleanInstantRates(d.instantRates, d.services ?? []);
+  const hasInstant = Boolean(d.instantAvailable) && Object.keys(rates).length > 0;
+
   const user = await prisma.user.create({
     data: {
       name: d.name,
@@ -50,8 +56,9 @@ export async function POST(req: Request) {
                 gender: d.gender || null,
                 experienceYears: d.experienceYears ?? 0,
                 expectedSalary: d.expectedSalary ?? null,
-                instantAvailable: d.instantAvailable ?? false,
-                dailyRate: d.instantAvailable ? d.dailyRate ?? null : null,
+                instantAvailable: hasInstant,
+                dailyRate: hasInstant ? minRate(rates) : null,
+                instantRates: hasInstant ? rates : Prisma.JsonNull,
                 bio: d.bio || null,
                 // Starts unverified — provider uploads ID, admin approves.
                 verified: false,

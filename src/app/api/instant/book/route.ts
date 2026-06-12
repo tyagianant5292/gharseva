@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/auth";
 import { sendInstantBookingRequestEmail } from "@/lib/email";
 import { formatMoney } from "@/lib/money";
 import { serviceLabel } from "@/lib/services";
+import { asRates } from "@/lib/instant";
 
 const schema = z.object({
   providerId: z.string().min(1),
@@ -50,14 +51,17 @@ export async function POST(req: Request) {
   });
   if (!provider || !provider.available)
     return NextResponse.json({ error: "Helper not found." }, { status: 404 });
-  if (!provider.instantAvailable || provider.dailyRate == null)
+  if (!provider.instantAvailable)
     return NextResponse.json({ error: "This helper isn't available for daily bookings." }, { status: 400 });
   if (provider.userId === session.id)
     return NextResponse.json({ error: "You can't book yourself." }, { status: 400 });
-  if (!provider.services.includes(d.service))
-    return NextResponse.json({ error: "This helper doesn't offer that service." }, { status: 400 });
 
-  const ratePerDay = provider.dailyRate;
+  // Rate depends on the chosen service.
+  const rates = asRates(provider.instantRates);
+  const ratePerDay = rates[d.service];
+  if (!ratePerDay || ratePerDay <= 0)
+    return NextResponse.json({ error: "This helper isn't available for that service by the day." }, { status: 400 });
+
   const totalAmount = ratePerDay * days;
 
   const booking = await prisma.instantBooking.create({
