@@ -13,6 +13,7 @@ const schema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Pick a start date"),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Pick an end date"),
   message: z.string().trim().max(600).optional(),
+  address: z.string().trim().max(300).optional(),
 });
 
 // Number of calendar days in an inclusive [start, end] range.
@@ -75,6 +76,7 @@ export async function POST(req: Request) {
       ratePerDay,
       totalAmount,
       message: d.message || null,
+      address: d.address || null,
       status: "PENDING",
     },
   });

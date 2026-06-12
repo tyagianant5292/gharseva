@@ -121,6 +121,7 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
   const [svc, setSvc] = useState(instantServices[0] || "");
   const [start, setStart] = useState(todayStr());
   const [end, setEnd] = useState(todayStr());
+  const [address, setAddress] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -139,7 +140,7 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
       const res = await fetch("/api/instant/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ providerId: p.id, service: svc, startDate: start, endDate: end, message: message.trim() || undefined }),
+        body: JSON.stringify({ providerId: p.id, service: svc, startDate: start, endDate: end, address: address.trim() || undefined, message: message.trim() || undefined }),
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Could not book");
@@ -217,8 +218,12 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
             </div>
           </div>
           <div>
+            <label className="label">Your address <span className="font-normal text-slate-400">(where to come)</span></label>
+            <textarea value={address} onChange={(e) => setAddress(e.target.value)} required rows={2} maxLength={300} className="input" placeholder="House / flat, area, city, landmark…" />
+          </div>
+          <div>
             <label className="label">Note (optional)</label>
-            <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={2} maxLength={600} className="input" placeholder="What you need, timings, address area…" />
+            <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={2} maxLength={600} className="input" placeholder="What you need, timings…" />
           </div>
 
           {validRange && rate > 0 && (
@@ -229,7 +234,7 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
           )}
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex gap-2">
-            <button type="submit" disabled={busy || !validRange || rate <= 0} className="btn-primary justify-center disabled:opacity-50">
+            <button type="submit" disabled={busy || !validRange || rate <= 0 || !address.trim()} className="btn-primary justify-center disabled:opacity-50">
               {busy ? "Sending…" : "Send booking request"}
             </button>
             <button type="button" onClick={onToggle} className="btn-outline">Cancel</button>

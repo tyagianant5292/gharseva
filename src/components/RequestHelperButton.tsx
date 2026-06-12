@@ -29,6 +29,7 @@ export default function RequestHelperButton({
   const [service, setService] = useState(initialRequest?.service || services[0] || "");
   const [message, setMessage] = useState(initialRequest?.message || "");
   const [preferredTime, setPreferredTime] = useState(initialRequest?.preferredTime || "");
+  const [address, setAddress] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -40,7 +41,7 @@ export default function RequestHelperButton({
       const res = await fetch(`/api/providers/${providerId}/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ service, message: message.trim() || undefined, preferredTime: preferredTime.trim() || undefined }),
+        body: JSON.stringify({ service, message: message.trim() || undefined, preferredTime: preferredTime.trim() || undefined, address: address.trim() || undefined }),
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Could not send request");
@@ -110,6 +111,10 @@ export default function RequestHelperButton({
                 placeholder="e.g. Mornings, weekdays"
               />
             </div>
+          </div>
+          <div className="mt-3">
+            <label className="label">Your address <span className="font-normal text-slate-400">(where the helper should come)</span></label>
+            <textarea value={address} onChange={(e) => setAddress(e.target.value)} required rows={2} maxLength={300} className="input" placeholder="House / flat, area, city, landmark…" />
           </div>
           <div className="mt-3">
             <label className="label">Message (optional)</label>

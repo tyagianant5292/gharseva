@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Zap, Phone, Mail, Check, X, Clock, CalendarDays } from "lucide-react";
 import { serviceLabel } from "@/lib/services";
 import { formatMoney } from "@/lib/money";
+import CustomerInfo from "./CustomerInfo";
 
 type Status = "PENDING" | "ACCEPTED" | "DECLINED";
 type Booking = {
@@ -11,6 +12,10 @@ type Booking = {
   customerName: string;
   customerMobile: string;
   customerEmail: string | null;
+  customerEmailVerified: boolean;
+  customerSince: string;
+  customerBookings: number;
+  address: string | null;
   service: string;
   startDate: string;
   endDate: string;
@@ -90,7 +95,8 @@ export default function ProviderInstantBookings() {
                   {formatMoney(r.totalAmount, country)} <span className="font-normal text-slate-400">({formatMoney(r.ratePerDay, country)}/day · cash on arrival)</span>
                 </p>
                 {r.message && <p className="mt-1 text-sm text-slate-600">“{r.message}”</p>}
-                <p className="mt-1 flex flex-wrap items-center gap-x-3 text-sm text-slate-500">
+                <CustomerInfo address={r.address} emailVerified={r.customerEmailVerified} since={r.customerSince} bookings={r.customerBookings} />
+                <p className="mt-1.5 flex flex-wrap items-center gap-x-3 text-sm text-slate-500">
                   <a href={`tel:${r.customerMobile}`} className="flex items-center gap-1 hover:text-brand-600"><Phone size={12} /> {r.customerMobile}</a>
                   {r.customerEmail && <a href={`mailto:${r.customerEmail}`} className="flex items-center gap-1 hover:text-brand-600"><Mail size={12} /> {r.customerEmail}</a>}
                 </p>

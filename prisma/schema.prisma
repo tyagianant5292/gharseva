@@ -100,6 +100,7 @@ model InstantBooking {
   ratePerDay   Int // snapshot of the provider's daily rate at booking time
   totalAmount  Int // days * ratePerDay
   message      String?
+  address      String? // service address the customer wants the helper to come to
   status       RequestStatus   @default(PENDING)
   responseNote String? // provider's reason when declining
   createdAt    DateTime        @default(now())
@@ -118,6 +119,7 @@ model BookingRequest {
   service       String?
   message       String?
   preferredTime String?
+  address       String? // service address the customer wants the helper to come to
   status        RequestStatus   @default(PENDING)
   responseNote  String? // provider's reason/note when declining (or accepting)
   createdAt     DateTime        @default(now())

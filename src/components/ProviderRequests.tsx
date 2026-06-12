@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Inbox, Phone, Mail, Check, X, Clock } from "lucide-react";
 import { serviceLabel } from "@/lib/services";
+import CustomerInfo from "./CustomerInfo";
 
 type Status = "PENDING" | "ACCEPTED" | "DECLINED";
 type Req = {
@@ -10,9 +11,13 @@ type Req = {
   customerName: string;
   customerMobile: string;
   customerEmail: string | null;
+  customerEmailVerified: boolean;
+  customerSince: string;
+  customerBookings: number;
   service: string | null;
   message: string | null;
   preferredTime: string | null;
+  address: string | null;
   status: Status;
   responseNote: string | null;
   createdAt: string;
@@ -77,8 +82,9 @@ export default function ProviderRequests() {
                 {r.service && <p className="mt-0.5 text-sm text-slate-600">Needs: {serviceLabel(r.service)}</p>}
                 {r.preferredTime && <p className="text-sm text-slate-500">Time: {r.preferredTime}</p>}
                 {r.message && <p className="mt-1 text-sm text-slate-600">“{r.message}”</p>}
+                <CustomerInfo address={r.address} emailVerified={r.customerEmailVerified} since={r.customerSince} bookings={r.customerBookings} />
                 {/* Contact shown so the provider can respond */}
-                <p className="mt-1 flex flex-wrap items-center gap-x-3 text-sm text-slate-500">
+                <p className="mt-1.5 flex flex-wrap items-center gap-x-3 text-sm text-slate-500">
                   <a href={`tel:${r.customerMobile}`} className="flex items-center gap-1 hover:text-brand-600">
                     <Phone size={12} /> {r.customerMobile}
                   </a>

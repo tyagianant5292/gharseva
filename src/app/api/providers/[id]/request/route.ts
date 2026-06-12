@@ -8,6 +8,7 @@ const schema = z.object({
   service: z.string().trim().max(40).optional(),
   message: z.string().trim().max(600).optional(),
   preferredTime: z.string().trim().max(80).optional(),
+  address: z.string().trim().max(300).optional(),
 });
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -37,12 +38,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       service: d.service || null,
       message: d.message || null,
       preferredTime: d.preferredTime || null,
+      address: d.address || null,
       status: "PENDING",
     },
     update: {
       service: d.service || null,
       message: d.message || null,
       preferredTime: d.preferredTime || null,
+      address: d.address || null,
       status: "PENDING",
     },
   });
