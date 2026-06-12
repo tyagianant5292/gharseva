@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { profileSchema } from "@/lib/validation";
 import { cleanInstantRates, minRate, asRates } from "@/lib/instant";
+import { geocodeProvider } from "@/lib/geocode";
 
 // Returns the current provider's profile (for the dashboard).
 export async function GET() {
@@ -93,6 +94,18 @@ export async function PUT(req: Request) {
   if ((d.services?.length ?? 0) === 0 && !hasInstant)
     return NextResponse.json({ error: "Select at least one service" }, { status: 400 });
 
+  // Re-derive the map pin from the stated area when the location changes (or is
+  // missing) so "near me" stays accurate even if a stale GPS pin was set elsewhere.
+  const locationChanged =
+    existing.country !== (d.country ?? "IN") ||
+    existing.city !== d.city ||
+    existing.locality !== d.locality ||
+    existing.pincode !== (d.pincode ?? "");
+  const geo =
+    locationChanged || existing.lat == null
+      ? await geocodeProvider(d.country ?? "IN", d.pincode ?? "", d.city, d.locality)
+      : null;
+
   // Keep the user's mobile in sync (contact number).
   await prisma.user.update({ where: { id: session.id }, data: { mobile: d.mobile } });
 
@@ -110,6 +123,7 @@ export async function PUT(req: Request) {
       instantAvailable: hasInstant,
       dailyRate: hasInstant ? minRate(rates) : null,
       instantRates: hasInstant ? rates : Prisma.JsonNull,
+      ...(geo ? { lat: geo.lat, lng: geo.lng } : {}),
       bio: d.bio || null,
       // 'available' is controlled by the dedicated toggle, not this form.
       // Verification is controlled by admin approval.

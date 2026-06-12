@@ -5,6 +5,7 @@ import { hashPassword, createSession } from "@/lib/auth";
 import { registerSchema } from "@/lib/validation";
 import { newToken, sendVerificationEmail } from "@/lib/email";
 import { cleanInstantRates, minRate } from "@/lib/instant";
+import { geocodeProvider } from "@/lib/geocode";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -35,6 +36,12 @@ export async function POST(req: Request) {
   const rates = cleanInstantRates(d.instantRates);
   const hasInstant = Boolean(d.instantAvailable) && Object.keys(rates).length > 0;
 
+  // Derive the map pin from the stated area so "near me" search is accurate.
+  const geo =
+    d.role === "PROVIDER"
+      ? await geocodeProvider(d.country ?? "IN", d.pincode ?? "", d.city ?? "", d.locality ?? "")
+      : null;
+
   const user = await prisma.user.create({
     data: {
       name: d.name,
@@ -59,6 +66,8 @@ export async function POST(req: Request) {
                 instantAvailable: hasInstant,
                 dailyRate: hasInstant ? minRate(rates) : null,
                 instantRates: hasInstant ? rates : Prisma.JsonNull,
+                lat: geo?.lat ?? null,
+                lng: geo?.lng ?? null,
                 bio: d.bio || null,
                 // Starts unverified — provider uploads ID, admin approves.
                 verified: false,
