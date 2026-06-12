@@ -55,6 +55,8 @@ export async function GET() {
           instantRates: asRates(p.instantRates),
           otherService: p.otherService,
           otherServiceDesc: p.otherServiceDesc,
+          availableDays: p.availableDays,
+          availableTime: p.availableTime,
           bio: p.bio,
           available: p.available,
           verified: p.verified,
@@ -131,6 +133,8 @@ export async function PUT(req: Request) {
       ...(geo ? { lat: geo.lat, lng: geo.lng } : {}),
       otherService: offersOther ? d.otherService || null : null,
       otherServiceDesc: offersOther ? d.otherServiceDesc || null : null,
+      availableDays: hasInstant ? d.availableDays ?? [] : [],
+      availableTime: hasInstant ? d.availableTime || null : null,
       bio: d.bio || null,
       // 'available' is controlled by the dedicated toggle, not this form.
       // Verification is controlled by admin approval.

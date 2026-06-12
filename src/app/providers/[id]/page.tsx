@@ -6,6 +6,7 @@ import Link from "next/link";
 import { BadgeCheck, MapPin, Briefcase, Phone, Mail, Lock, ArrowLeft, Zap, CalendarDays } from "lucide-react";
 import { displayService, serviceIcon } from "@/lib/services";
 import { formatMoney } from "@/lib/money";
+import { formatDays } from "@/lib/availability";
 import Stars from "@/components/Stars";
 import ReviewsSection, { type Review } from "@/components/ReviewsSection";
 import RequestHelperButton from "@/components/RequestHelperButton";
@@ -27,6 +28,8 @@ type Detail = {
   dailyRate?: number | null;
   otherService?: string | null;
   otherServiceDesc?: string | null;
+  availableDays?: string[] | null;
+  availableTime?: string | null;
   bio?: string | null;
   photoUrl?: string | null;
   verified: boolean;
@@ -163,6 +166,14 @@ export default function ProviderDetailPage() {
               <CalendarDays size={15} /> Book by the day →
             </span>
           </Link>
+        )}
+        {p.instantAvailable && (
+          <p className="mt-1.5 flex flex-wrap items-center gap-x-3 text-xs text-slate-500">
+            <span className="inline-flex items-center gap-1">
+              <CalendarDays size={12} className="text-sky-600" /> Available: {formatDays(p.availableDays)}
+            </span>
+            {p.availableTime && <span>· {p.availableTime}</span>}
+          </p>
         )}
 
         {p.bio ? (

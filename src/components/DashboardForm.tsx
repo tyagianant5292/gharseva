@@ -14,6 +14,7 @@ import LocationFields, { type LocationValue } from "./LocationFields";
 import PhoneInput from "./PhoneInput";
 import InstantAvailabilityField from "./InstantAvailabilityField";
 import OtherServiceFields from "./OtherServiceFields";
+import AvailabilityFields from "./AvailabilityFields";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -39,6 +40,8 @@ type Profile = {
     instantRates: Record<string, number> | null;
     otherService: string | null;
     otherServiceDesc: string | null;
+    availableDays: string[];
+    availableTime: string | null;
     bio: string | null;
     available: boolean;
     lat: number | null;
@@ -71,6 +74,8 @@ export default function DashboardForm() {
   const [instantRates, setInstantRates] = useState<Record<string, number>>({});
   const [otherService, setOtherService] = useState("");
   const [otherServiceDesc, setOtherServiceDesc] = useState("");
+  const [availableDays, setAvailableDays] = useState<string[]>([]);
+  const [availableTime, setAvailableTime] = useState("");
   const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -88,6 +93,8 @@ export default function DashboardForm() {
         setInstantRates(d.provider.instantRates || {});
         setOtherService(d.provider.otherService || "");
         setOtherServiceDesc(d.provider.otherServiceDesc || "");
+        setAvailableDays(d.provider.availableDays || []);
+        setAvailableTime(d.provider.availableTime || "");
         // services now holds MONTHLY services; instant services live in instantRates.
         const hasMonthly = (d.provider.services?.length ?? 0) > 0 || d.provider.expectedSalary != null;
         setWorkMode(
@@ -122,6 +129,8 @@ export default function DashboardForm() {
           expectedSalary: workMode === "daily" ? undefined : f.get("expectedSalary") || undefined,
           instantAvailable: workMode !== "monthly",
           instantRates: workMode !== "monthly" ? instantRates : undefined,
+          availableDays: workMode !== "monthly" ? availableDays : undefined,
+          availableTime: workMode !== "monthly" ? availableTime || undefined : undefined,
           otherService: otherService || undefined,
           otherServiceDesc: otherServiceDesc || undefined,
           bio: f.get("bio") || undefined,
@@ -428,6 +437,10 @@ export default function DashboardForm() {
                     onChange={setInstantRates}
                     currency={isUAE ? "AED" : "₹"}
                   />
+                )}
+
+                {workMode !== "monthly" && (
+                  <AvailabilityFields days={availableDays} setDays={setAvailableDays} time={availableTime} setTime={setAvailableTime} />
                 )}
 
                 {((workMode !== "daily" && services.includes("OTHER")) ||

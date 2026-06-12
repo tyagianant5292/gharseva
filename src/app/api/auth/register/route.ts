@@ -71,6 +71,8 @@ export async function POST(req: Request) {
                 lng: geo?.lng ?? null,
                 otherService: offersOther ? d.otherService || null : null,
                 otherServiceDesc: offersOther ? d.otherServiceDesc || null : null,
+                availableDays: hasInstant ? d.availableDays ?? [] : [],
+                availableTime: hasInstant ? d.availableTime || null : null,
                 bio: d.bio || null,
                 // Starts unverified — provider uploads ID, admin approves.
                 verified: false,

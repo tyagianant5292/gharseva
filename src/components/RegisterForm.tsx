@@ -8,6 +8,7 @@ import LocationFields, { type LocationValue } from "./LocationFields";
 import PhoneInput from "./PhoneInput";
 import InstantAvailabilityField from "./InstantAvailabilityField";
 import OtherServiceFields from "./OtherServiceFields";
+import AvailabilityFields from "./AvailabilityFields";
 
 type Role = "CUSTOMER" | "PROVIDER";
 
@@ -22,6 +23,8 @@ export default function RegisterForm() {
   const [instantRates, setInstantRates] = useState<Record<string, number>>({});
   const [otherService, setOtherService] = useState("");
   const [otherServiceDesc, setOtherServiceDesc] = useState("");
+  const [availableDays, setAvailableDays] = useState<string[]>([]);
+  const [availableTime, setAvailableTime] = useState("");
   const [loc, setLoc] = useState<LocationValue>({ city: "", locality: "", pincode: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -54,6 +57,8 @@ export default function RegisterForm() {
         expectedSalary: workMode === "daily" ? undefined : f.get("expectedSalary") || undefined,
         instantAvailable: workMode !== "monthly",
         instantRates: workMode !== "monthly" ? instantRates : undefined,
+        availableDays: workMode !== "monthly" ? availableDays : undefined,
+        availableTime: workMode !== "monthly" ? availableTime || undefined : undefined,
         otherService: otherService || undefined,
         otherServiceDesc: otherServiceDesc || undefined,
         bio: f.get("bio") || undefined,
@@ -228,6 +233,10 @@ export default function RegisterForm() {
                   onChange={setInstantRates}
                   currency={country === "AE" ? "AED" : "₹"}
                 />
+              )}
+
+              {workMode !== "monthly" && (
+                <AvailabilityFields days={availableDays} setDays={setAvailableDays} time={availableTime} setTime={setAvailableTime} />
               )}
 
               {((workMode !== "daily" && services.includes("OTHER")) ||

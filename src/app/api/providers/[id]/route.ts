@@ -64,6 +64,8 @@ export async function GET(
       instantRates: asRates(p.instantRates),
       otherService: p.otherService,
       otherServiceDesc: p.otherServiceDesc,
+      availableDays: p.availableDays,
+      availableTime: p.availableTime,
       bio: p.bio,
       photoUrl: p.photoUrl,
       verificationStatus: p.verificationStatus,

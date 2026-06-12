@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, Zap, MapPin, BadgeCheck, CalendarDays } from "lucide-react";
+import { Search, Zap, MapPin, BadgeCheck, CalendarDays, Clock } from "lucide-react";
 import { SERVICES, displayService, serviceIcon } from "@/lib/services";
 import { formatMoney } from "@/lib/money";
+import { formatDays } from "@/lib/availability";
 import CityAutocomplete from "./CityAutocomplete";
 import Stars from "./Stars";
 
@@ -13,6 +14,9 @@ type Item = {
   name: string;
   services: string[];
   otherService?: string | null;
+  otherServiceDesc?: string | null;
+  availableDays?: string[] | null;
+  availableTime?: string | null;
   country?: string | null;
   city: string;
   locality: string;
@@ -189,6 +193,23 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
         ))}
       </div>
 
+      {instantServices.includes("OTHER") && p.otherServiceDesc && (
+        <p className="mt-2 text-sm text-slate-600">
+          <span className="font-medium text-slate-700">✨ {p.otherService}:</span> {p.otherServiceDesc}
+        </p>
+      )}
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+        <span className="inline-flex items-center gap-1">
+          <CalendarDays size={12} className="text-sky-600" /> {formatDays(p.availableDays)}
+        </span>
+        {p.availableTime && (
+          <span className="inline-flex items-center gap-1">
+            <Clock size={12} className="text-sky-600" /> {p.availableTime}
+          </span>
+        )}
+      </div>
+
       {done ? (
         <div className="mt-3 rounded-lg bg-teal-50 p-3 text-sm text-teal-800 ring-1 ring-teal-200">
           ✅ Booking request sent! The helper will accept or decline shortly — track it in{" "}
@@ -218,6 +239,11 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
               <input type="date" min={start} value={end} onChange={(e) => setEnd(e.target.value)} className="input" />
             </div>
           </div>
+          {(p.availableDays?.length || p.availableTime) && (
+            <p className="-mt-1 text-xs text-sky-700">
+              📅 Usually free: {formatDays(p.availableDays)}{p.availableTime ? ` · ${p.availableTime}` : ""}
+            </p>
+          )}
           <div>
             <label className="label">Your address <span className="font-normal text-slate-400">(where to come)</span></label>
             <textarea value={address} onChange={(e) => setAddress(e.target.value)} required rows={2} maxLength={300} className="input" placeholder="House / flat, area, city, landmark…" />

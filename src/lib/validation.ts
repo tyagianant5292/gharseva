@@ -31,6 +31,8 @@ export const registerSchema = z
     instantRates: z.record(z.coerce.number().int().min(1).max(100_000)).optional(),
     otherService: z.string().trim().max(60).optional(),
     otherServiceDesc: z.string().trim().max(300).optional(),
+    availableDays: z.array(z.enum(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"])).optional(),
+    availableTime: z.string().trim().max(60).optional(),
     bio: z.string().trim().max(1000).optional(),
   })
   .superRefine((data, ctx) => {
@@ -76,6 +78,8 @@ export const profileSchema = z.object({
   instantRates: z.record(z.coerce.number().int().min(1).max(100_000)).optional(),
   otherService: z.string().trim().max(60).optional(),
   otherServiceDesc: z.string().trim().max(300).optional(),
+  availableDays: z.array(z.enum(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"])).optional(),
+  availableTime: z.string().trim().max(60).optional(),
   bio: z.string().trim().max(1000).optional(),
   mobile,
 });
