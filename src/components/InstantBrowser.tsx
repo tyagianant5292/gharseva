@@ -182,7 +182,7 @@ function InstantCard({ p, open, onToggle }: { p: Item; open: boolean; onToggle: 
       </div>
 
       <div className="mt-3 flex flex-wrap gap-1.5">
-        {p.services.slice(0, 4).map((s) => (
+        {instantServices.slice(0, 5).map((s) => (
           <span key={s} className="chip">{serviceIcon(s)} {serviceLabel(s)}</span>
         ))}
       </div>

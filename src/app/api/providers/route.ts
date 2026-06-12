@@ -21,7 +21,9 @@ export async function GET(req: Request) {
   const nearMe = isValidLatLng(lat, lng) && radius > 0;
 
   const where: Prisma.ProviderProfileWhereInput = { available: true };
-  if (service) where.services = { has: service };
+  // For instant search we match on per-service daily rates (filtered below), not the
+  // monthly `services` list — the two are independent.
+  if (service && !instantOnly) where.services = { has: service };
   if (verifiedOnly) where.verified = true;
   if (instantOnly) where.instantAvailable = true;
   if (q) where.user = { is: { name: { contains: q, mode: "insensitive" } } };
@@ -87,6 +89,11 @@ export async function GET(req: Request) {
     ratingCount: p.ratingCount,
     distanceKm: null as number | null,
   }));
+
+  // Instant search: keep only providers who offer the requested service by the day.
+  if (instantOnly && service) {
+    result = result.filter((p) => p.instantRates[service] != null);
+  }
 
   if (nearMe) {
     result = result

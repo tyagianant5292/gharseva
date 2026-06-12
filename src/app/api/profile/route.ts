@@ -86,8 +86,12 @@ export async function PUT(req: Request) {
   }
   const d = parsed.data;
 
-  const rates = cleanInstantRates(d.instantRates, d.services);
+  const rates = cleanInstantRates(d.instantRates);
   const hasInstant = Boolean(d.instantAvailable) && Object.keys(rates).length > 0;
+
+  // A provider must offer at least one service — monthly or daily.
+  if ((d.services?.length ?? 0) === 0 && !hasInstant)
+    return NextResponse.json({ error: "Select at least one service" }, { status: 400 });
 
   // Keep the user's mobile in sync (contact number).
   await prisma.user.update({ where: { id: session.id }, data: { mobile: d.mobile } });

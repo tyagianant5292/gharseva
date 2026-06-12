@@ -1,13 +1,15 @@
 // Helpers for per-service daily ("instant") rates, stored as { serviceKey: ratePerDay }.
+import { SERVICE_KEYS } from "./services";
 
-// Keep only services the provider actually offers, with a positive integer rate.
+// Keep only valid service keys with a positive integer rate. Instant services are
+// chosen independently of the provider's monthly services, so we validate against
+// the full service list — not a passed-in subset.
 export function cleanInstantRates(
   rates: Record<string, unknown> | undefined | null,
-  services: string[],
 ): Record<string, number> {
   const out: Record<string, number> = {};
   if (!rates) return out;
-  for (const s of services) {
+  for (const s of SERVICE_KEYS) {
     const r = Number(rates[s as keyof typeof rates]);
     if (Number.isFinite(r) && r > 0) out[s] = Math.round(r);
   }

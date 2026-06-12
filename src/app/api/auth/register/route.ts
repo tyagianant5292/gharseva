@@ -31,8 +31,8 @@ export async function POST(req: Request) {
   const passwordHash = await hashPassword(d.password);
   const verifyToken = d.email ? newToken() : null;
 
-  // Per-service daily rates (only kept for services they offer, rate > 0).
-  const rates = cleanInstantRates(d.instantRates, d.services ?? []);
+  // Per-service daily rates — chosen independently of monthly services.
+  const rates = cleanInstantRates(d.instantRates);
   const hasInstant = Boolean(d.instantAvailable) && Object.keys(rates).length > 0;
 
   const user = await prisma.user.create({

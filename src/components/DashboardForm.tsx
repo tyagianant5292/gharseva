@@ -81,7 +81,8 @@ export default function DashboardForm() {
         setCountry(d.provider.country === "AE" ? "AE" : "IN");
         setLoc({ city: d.provider.city, locality: d.provider.locality, pincode: d.provider.pincode });
         setInstantRates(d.provider.instantRates || {});
-        const hasMonthly = d.provider.expectedSalary != null;
+        // services now holds MONTHLY services; instant services live in instantRates.
+        const hasMonthly = (d.provider.services?.length ?? 0) > 0 || d.provider.expectedSalary != null;
         setWorkMode(
           d.provider.instantAvailable ? (hasMonthly ? "both" : "daily") : "monthly",
         );
@@ -103,7 +104,7 @@ export default function DashboardForm() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          services,
+          services: workMode === "daily" ? [] : services,
           country,
           mobile: f.get("mobile"),
           city: loc.city,
@@ -326,25 +327,27 @@ export default function DashboardForm() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="label">Services</label>
-                  <div className="flex flex-wrap gap-2">
-                    {SERVICES.map((s) => (
-                      <button
-                        key={s.key}
-                        type="button"
-                        onClick={() => toggleService(s.key)}
-                        className={`rounded-full px-3 py-1 text-sm font-medium ring-1 transition-colors ${
-                          services.includes(s.key)
-                            ? "bg-brand-600 text-white ring-brand-600"
-                            : "bg-white text-slate-600 ring-slate-300 hover:ring-brand-300"
-                        }`}
-                      >
-                        {s.icon} {s.label}
-                      </button>
-                    ))}
+                {workMode !== "daily" && (
+                  <div>
+                    <label className="label">{workMode === "both" ? "Monthly services" : "Services"}</label>
+                    <div className="flex flex-wrap gap-2">
+                      {SERVICES.map((s) => (
+                        <button
+                          key={s.key}
+                          type="button"
+                          onClick={() => toggleService(s.key)}
+                          className={`rounded-full px-3 py-1 text-sm font-medium ring-1 transition-colors ${
+                            services.includes(s.key)
+                              ? "bg-brand-600 text-white ring-brand-600"
+                              : "bg-white text-slate-600 ring-slate-300 hover:ring-brand-300"
+                          }`}
+                        >
+                          {s.icon} {s.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div>
                   <label className="label">Country</label>
@@ -412,7 +415,6 @@ export default function DashboardForm() {
 
                 {workMode !== "monthly" && (
                   <InstantAvailabilityField
-                    services={services}
                     rates={instantRates}
                     onChange={setInstantRates}
                     currency={isUAE ? "AED" : "₹"}

@@ -41,7 +41,7 @@ export default function RegisterForm() {
     };
     if (role === "PROVIDER") {
       Object.assign(payload, {
-        services,
+        services: workMode === "daily" ? [] : services,
         country,
         city: loc.city,
         locality: loc.locality,
@@ -150,27 +150,6 @@ export default function RegisterForm() {
                 )}
               </div>
               <div>
-                <label className="label">Services you offer</label>
-                <div className="flex flex-wrap gap-2">
-                  {SERVICES.map((s) => (
-                    <button
-                      key={s.key}
-                      type="button"
-                      onClick={() => toggleService(s.key)}
-                      className={`rounded-full px-3 py-1 text-sm font-medium ring-1 transition-colors ${
-                        services.includes(s.key)
-                          ? "bg-brand-600 text-white ring-brand-600"
-                          : "bg-white text-slate-600 ring-slate-300 hover:ring-brand-300"
-                      }`}
-                    >
-                      {s.icon} {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <LocationFields value={loc} onChange={setLoc} country={country} />
-
-              <div>
                 <label className="label">How do you want to work?</label>
                 <div className="grid grid-cols-3 gap-2 rounded-lg bg-slate-100 p-1">
                   {([["monthly", "Monthly"], ["daily", "Daily / short-term"], ["both", "Both"]] as const).map(([m, lbl]) => (
@@ -187,9 +166,33 @@ export default function RegisterForm() {
                   ))}
                 </div>
                 {workMode === "daily" && (
-                  <p className="mt-1.5 text-xs text-slate-500">Great for helpers available only for short / per-day jobs.</p>
+                  <p className="mt-1.5 text-xs text-slate-500">Great for helpers available only for short / per-day jobs — set your services &amp; rates below.</p>
                 )}
               </div>
+
+              {workMode !== "daily" && (
+                <div>
+                  <label className="label">{workMode === "both" ? "Monthly services you offer" : "Services you offer"}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {SERVICES.map((s) => (
+                      <button
+                        key={s.key}
+                        type="button"
+                        onClick={() => toggleService(s.key)}
+                        className={`rounded-full px-3 py-1 text-sm font-medium ring-1 transition-colors ${
+                          services.includes(s.key)
+                            ? "bg-brand-600 text-white ring-brand-600"
+                            : "bg-white text-slate-600 ring-slate-300 hover:ring-brand-300"
+                        }`}
+                      >
+                        {s.icon} {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <LocationFields value={loc} onChange={setLoc} country={country} />
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -216,7 +219,6 @@ export default function RegisterForm() {
 
               {workMode !== "monthly" && (
                 <InstantAvailabilityField
-                  services={services}
                   rates={instantRates}
                   onChange={setInstantRates}
                   currency={country === "AE" ? "AED" : "₹"}

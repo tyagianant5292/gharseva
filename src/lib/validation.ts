@@ -33,7 +33,9 @@ export const registerSchema = z
   })
   .superRefine((data, ctx) => {
     if (data.role === "PROVIDER") {
-      if (!data.services || data.services.length === 0)
+      // At least one service — monthly (services) OR daily (instantRates).
+      const hasInstant = data.instantRates && Object.keys(data.instantRates).length > 0;
+      if ((!data.services || data.services.length === 0) && !hasInstant)
         ctx.addIssue({ code: "custom", path: ["services"], message: "Select at least one service" });
       if (!data.city)
         ctx.addIssue({ code: "custom", path: ["city"], message: "City is required" });
@@ -52,7 +54,8 @@ export const loginSchema = z.object({
 });
 
 export const profileSchema = z.object({
-  services: z.array(z.enum(SERVICE_KEYS as [string, ...string[]])).min(1, "Select at least one service"),
+  // May be empty for daily-only helpers (validated together with instantRates in the route).
+  services: z.array(z.enum(SERVICE_KEYS as [string, ...string[]])).default([]),
   country: z.enum(["IN", "AE"]).optional(),
   city: z.string().trim().min(1, "City is required").max(80),
   locality: z.string().trim().min(1, "Locality is required").max(120),
