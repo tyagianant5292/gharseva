@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, Lock, BadgeCheck, Save } from "lucide-react";
+import PhoneInput from "./PhoneInput";
 
 type Account = { name: string; email: string | null; mobile: string; role: string; emailVerified: boolean };
 
@@ -85,7 +86,7 @@ export default function AccountForm() {
         </div>
         <div>
           <label className="label">Mobile number</label>
-          <input name="mobile" defaultValue={acc.mobile} required className="input" />
+          <PhoneInput defaultValue={acc.mobile} required />
         </div>
         <div>
           <label className="label">

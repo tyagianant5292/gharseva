@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SERVICES } from "@/lib/services";
 import LocationFields, { type LocationValue } from "./LocationFields";
+import PhoneInput from "./PhoneInput";
 
 type Role = "CUSTOMER" | "PROVIDER";
 
@@ -95,7 +96,11 @@ export default function RegisterForm() {
             </div>
             <div>
               <label className="label">Mobile number</label>
-              <input name="mobile" required className="input" placeholder="+91 …" />
+              <PhoneInput
+                key={role === "PROVIDER" ? country : "default"}
+                required
+                defaultCode={role === "PROVIDER" && country === "AE" ? "+971" : "+91"}
+              />
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

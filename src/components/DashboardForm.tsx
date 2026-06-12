@@ -10,6 +10,7 @@ import ProfilePhotoCard from "./ProfilePhotoCard";
 import ProviderRequests from "./ProviderRequests";
 import LocationPicker from "./LocationPicker";
 import LocationFields, { type LocationValue } from "./LocationFields";
+import PhoneInput from "./PhoneInput";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -306,7 +307,7 @@ export default function DashboardForm() {
                   </div>
                   <div>
                     <label className="label">Mobile number</label>
-                    <input name="mobile" defaultValue={data.mobile} required className="input" />
+                    <PhoneInput defaultValue={data.mobile} defaultCode={isUAE ? "+971" : "+91"} required />
                   </div>
                 </div>
 
