@@ -40,30 +40,31 @@ export default function InstantAvailabilityField({
           return (
             <div
               key={s.key}
-              className={`flex items-center gap-2 rounded-lg p-2 ring-1 ${on ? "bg-white ring-amber-200" : "bg-white/50 ring-amber-100"}`}
+              className={`rounded-lg p-2.5 ring-1 ${on ? "bg-white ring-amber-200" : "bg-white/50 ring-amber-100"}`}
             >
-              <label className="flex flex-1 cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+              <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
                 <input
                   type="checkbox"
                   checked={on}
                   onChange={(e) => toggle(s.key, e.target.checked)}
-                  className="h-4 w-4 accent-amber-600"
+                  className="h-4 w-4 flex-shrink-0 accent-amber-600"
                 />
-                {s.icon} {s.label}
+                <span>{s.icon} {s.label}</span>
               </label>
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-slate-400">{currency}</span>
-                <input
-                  type="number"
-                  min={1}
-                  disabled={!on}
-                  value={on ? rates[s.key] || "" : ""}
-                  onChange={(e) => setRate(s.key, Number(e.target.value) || 0)}
-                  placeholder="rate"
-                  className="input w-20 py-1.5 disabled:bg-slate-50 disabled:text-slate-300"
-                />
-                <span className="text-xs text-slate-400">/day</span>
-              </div>
+              {on && (
+                <div className="mt-2 flex items-center gap-1 pl-6">
+                  <span className="text-xs text-slate-400">{currency}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={rates[s.key] || ""}
+                    onChange={(e) => setRate(s.key, Number(e.target.value) || 0)}
+                    placeholder="rate"
+                    className="input w-24 py-1.5"
+                  />
+                  <span className="text-xs text-slate-400">/day</span>
+                </div>
+              )}
             </div>
           );
         })}
