@@ -88,6 +88,21 @@ export async function sendVerificationResultEmail(
   return send(to, name, subject, html);
 }
 
+// Alerts the admin(s) that a provider submitted documents for verification.
+export async function sendAdminVerificationAlert(providerName: string, idDocType: string): Promise<void> {
+  const admins = (process.env.ADMIN_EMAILS || MAIL_FROM)
+    .split(",")
+    .map((e) => e.trim())
+    .filter(Boolean);
+  const subject = `🔔 New verification to review: ${providerName}`;
+  const html = `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto">
+      <h2 style="color:#ea580c">New verification pending</h2>
+      <p><b>${escapeHtml(providerName)}</b> submitted <b>${escapeHtml(idDocType)}</b> document(s) for verification.</p>
+      <p style="margin:20px 0"><a href="${SITE_URL}/admin" style="background:#ea580c;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Review in admin panel</a></p>
+    </div>`;
+  await Promise.all(admins.map((a) => send(a, "Admin", subject, html)));
+}
+
 export async function sendBookingRequestEmail(
   to: string,
   providerName: string,

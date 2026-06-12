@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { sendAdminVerificationAlert } from "@/lib/email";
 
 // data URL (image or PDF) up to ~3MB base64. Keeps DB rows reasonable for the MVP.
 const docUrl = z
@@ -60,6 +61,9 @@ export async function POST(req: Request) {
       verificationNote: null,
     },
   });
+
+  // Notify the admin that there's a document to review (fire-and-forget).
+  sendAdminVerificationAlert(session.name, d.idDocType).catch(() => {});
 
   return NextResponse.json({ ok: true, status: "PENDING" });
 }
