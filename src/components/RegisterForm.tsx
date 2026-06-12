@@ -6,6 +6,7 @@ import Link from "next/link";
 import { SERVICES } from "@/lib/services";
 import LocationFields, { type LocationValue } from "./LocationFields";
 import PhoneInput from "./PhoneInput";
+import InstantAvailabilityField from "./InstantAvailabilityField";
 
 type Role = "CUSTOMER" | "PROVIDER";
 
@@ -46,6 +47,8 @@ export default function RegisterForm() {
         gender: f.get("gender") || undefined,
         experienceYears: f.get("experienceYears") || 0,
         expectedSalary: f.get("expectedSalary") || undefined,
+        instantAvailable: f.get("instantAvailable") === "true",
+        dailyRate: f.get("dailyRate") || undefined,
         bio: f.get("bio") || undefined,
       });
     }
@@ -183,6 +186,7 @@ export default function RegisterForm() {
                   <input name="expectedSalary" type="number" min={0} className="input" placeholder={country === "AE" ? "e.g. 1500" : "e.g. 8000"} />
                 </div>
               </div>
+              <InstantAvailabilityField currency={country === "AE" ? "AED" : "₹"} />
               <div>
                 <label className="label">About you (optional)</label>
                 <textarea name="bio" rows={3} className="input" placeholder="Languages, timings, what you specialise in…" />

@@ -102,6 +102,27 @@ export async function sendBookingRequestEmail(
   return send(to, providerName, "New booking request on GharSeva", html);
 }
 
+export async function sendInstantBookingRequestEmail(
+  to: string,
+  providerName: string,
+  customerName: string,
+  service: string,
+  dateRange: string,
+  days: number,
+  total: string,
+): Promise<boolean> {
+  const html = `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto">
+      <h2 style="color:#ea580c">⚡ New daily booking request</h2>
+      <p>Hi ${escapeHtml(providerName)}, <b>${escapeHtml(customerName)}</b> wants to book you for <b>${escapeHtml(service)}</b>.</p>
+      <p style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px">
+        <b>Dates:</b> ${escapeHtml(dateRange)} (${days} ${days === 1 ? "day" : "days"})<br/>
+        <b>Total:</b> ${escapeHtml(total)} <span style="color:#92400e">(payable directly on arrival)</span>
+      </p>
+      <p style="margin:20px 0"><a href="${SITE_URL}/dashboard" style="background:#ea580c;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Accept or decline</a></p>
+    </div>`;
+  return send(to, providerName, "New daily booking request on GharSeva", html);
+}
+
 export async function sendBookingStatusEmail(
   to: string,
   customerName: string,

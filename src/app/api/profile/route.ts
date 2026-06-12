@@ -47,6 +47,8 @@ export async function GET() {
           gender: p.gender,
           experienceYears: p.experienceYears,
           expectedSalary: p.expectedSalary,
+          instantAvailable: p.instantAvailable,
+          dailyRate: p.dailyRate,
           bio: p.bio,
           available: p.available,
           verified: p.verified,
@@ -95,6 +97,8 @@ export async function PUT(req: Request) {
       gender: d.gender || null,
       experienceYears: d.experienceYears,
       expectedSalary: d.expectedSalary ?? null,
+      instantAvailable: d.instantAvailable ?? false,
+      dailyRate: d.instantAvailable ? d.dailyRate ?? null : null,
       bio: d.bio || null,
       // 'available' is controlled by the dedicated toggle, not this form.
       // Verification is controlled by admin approval.

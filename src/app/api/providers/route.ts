@@ -12,6 +12,7 @@ export async function GET(req: Request) {
   const pincode = searchParams.get("pincode")?.trim();
   const q = searchParams.get("q")?.trim();
   const verifiedOnly = searchParams.get("verified") === "1";
+  const instantOnly = searchParams.get("instant") === "1";
 
   const lat = parseFloat(searchParams.get("lat") || "");
   const lng = parseFloat(searchParams.get("lng") || "");
@@ -21,6 +22,7 @@ export async function GET(req: Request) {
   const where: Prisma.ProviderProfileWhereInput = { available: true };
   if (service) where.services = { has: service };
   if (verifiedOnly) where.verified = true;
+  if (instantOnly) where.instantAvailable = true;
   if (q) where.user = { is: { name: { contains: q, mode: "insensitive" } } };
   // In "near me" mode we filter by distance, not by text area fields.
   if (nearMe) {
@@ -48,6 +50,8 @@ export async function GET(req: Request) {
       gender: true,
       experienceYears: true,
       expectedSalary: true,
+      instantAvailable: true,
+      dailyRate: true,
       bio: true,
       photoThumbUrl: true,
       verified: true,
@@ -70,6 +74,8 @@ export async function GET(req: Request) {
     gender: p.gender,
     experienceYears: p.experienceYears,
     expectedSalary: p.expectedSalary,
+    instantAvailable: p.instantAvailable,
+    dailyRate: p.dailyRate,
     bio: p.bio,
     photoThumbUrl: p.photoThumbUrl,
     verified: p.verified,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home } from "lucide-react";
+import { Home, Zap } from "lucide-react";
 import { getSessionUser } from "@/lib/auth";
 import { isAdmin } from "@/lib/admin";
 import LogoutButton from "./LogoutButton";
@@ -23,6 +23,9 @@ export default async function Navbar() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link href="/providers" className="hidden text-sm font-medium text-slate-600 hover:text-brand-600 sm:block">
             Find Helpers
+          </Link>
+          <Link href="/instant" className="flex items-center gap-1 text-sm font-medium text-amber-600 hover:text-amber-700">
+            <Zap size={14} className="fill-amber-500 text-amber-500" /> Instant
           </Link>
           {user ? (
             <>

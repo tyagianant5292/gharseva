@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Phone, Check, X, Clock } from "lucide-react";
 import { serviceLabel } from "@/lib/services";
+import MyInstantBookings from "./MyInstantBookings";
 
 type Status = "PENDING" | "ACCEPTED" | "DECLINED";
 type Req = {
@@ -54,7 +55,7 @@ export default function MyRequests() {
           </Link>
         </div>
       ) : (
-        <div className="mt-5 space-y-3">
+        <div className="mt-5 space-y-3" data-section="contact-requests">
           {rows.map((r) => (
             <div key={r.id} className="card p-4">
               <div className="flex items-center justify-between">
@@ -89,6 +90,8 @@ export default function MyRequests() {
           ))}
         </div>
       )}
+
+      <MyInstantBookings />
     </div>
   );
 }

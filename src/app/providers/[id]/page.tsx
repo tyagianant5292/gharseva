@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { BadgeCheck, MapPin, Briefcase, Phone, Mail, Lock, ArrowLeft } from "lucide-react";
+import { BadgeCheck, MapPin, Briefcase, Phone, Mail, Lock, ArrowLeft, Zap, CalendarDays } from "lucide-react";
 import { serviceLabel, serviceIcon } from "@/lib/services";
 import { formatMoney } from "@/lib/money";
 import Stars from "@/components/Stars";
@@ -23,6 +23,8 @@ type Detail = {
   gender?: string | null;
   experienceYears: number;
   expectedSalary?: number | null;
+  instantAvailable?: boolean;
+  dailyRate?: number | null;
   bio?: string | null;
   photoUrl?: string | null;
   verified: boolean;
@@ -140,6 +142,21 @@ export default function ProviderDetailPage() {
             Expected salary: <span className="font-semibold text-slate-900">{formatMoney(p.expectedSalary, p.country)}/month</span>
           </p>
         ) : null}
+
+        {p.instantAvailable && p.dailyRate != null && (
+          <Link
+            href="/instant"
+            className="mt-4 flex items-center justify-between rounded-xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200 transition-colors hover:bg-amber-100"
+          >
+            <span className="flex items-center gap-2 text-sm font-medium text-amber-900">
+              <Zap size={16} className="fill-amber-500 text-amber-500" /> Available for daily booking —{" "}
+              <span className="font-bold">{formatMoney(p.dailyRate, p.country)}/day</span>
+            </span>
+            <span className="flex items-center gap-1 text-sm font-semibold text-amber-700">
+              <CalendarDays size={15} /> Book by the day →
+            </span>
+          </Link>
+        )}
 
         {p.bio ? (
           <div className="mt-4">

@@ -8,9 +8,11 @@ import EmailMethodCard from "./EmailMethodCard";
 import ProfileStatusToggle from "./ProfileStatusToggle";
 import ProfilePhotoCard from "./ProfilePhotoCard";
 import ProviderRequests from "./ProviderRequests";
+import ProviderInstantBookings from "./ProviderInstantBookings";
 import LocationPicker from "./LocationPicker";
 import LocationFields, { type LocationValue } from "./LocationFields";
 import PhoneInput from "./PhoneInput";
+import InstantAvailabilityField from "./InstantAvailabilityField";
 
 type Lead = { name: string; at: string };
 type Status = "PENDING" | "VERIFIED" | "REJECTED";
@@ -31,6 +33,8 @@ type Profile = {
     gender: string | null;
     experienceYears: number;
     expectedSalary: number | null;
+    instantAvailable: boolean;
+    dailyRate: number | null;
     bio: string | null;
     available: boolean;
     lat: number | null;
@@ -100,6 +104,8 @@ export default function DashboardForm() {
           gender: f.get("gender") || undefined,
           experienceYears: f.get("experienceYears") || 0,
           expectedSalary: f.get("expectedSalary") || undefined,
+          instantAvailable: f.get("instantAvailable") === "true",
+          dailyRate: f.get("dailyRate") || undefined,
           bio: f.get("bio") || undefined,
         }),
       });
@@ -262,6 +268,7 @@ export default function DashboardForm() {
               </div>
 
               {p && <ProviderRequests />}
+              {p && <ProviderInstantBookings />}
             </div>
           )}
 
@@ -373,6 +380,14 @@ export default function DashboardForm() {
                     <input name="expectedSalary" type="number" min={0} defaultValue={p?.expectedSalary ?? ""} className="input" />
                   </div>
                 </div>
+
+                {p && (
+                  <InstantAvailabilityField
+                    defaultChecked={p.instantAvailable}
+                    defaultRate={p.dailyRate}
+                    currency={isUAE ? "AED" : "₹"}
+                  />
+                )}
 
                 <div>
                   <label className="label">About</label>

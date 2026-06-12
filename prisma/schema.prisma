@@ -41,6 +41,7 @@ model User {
   contactViews     ContactView[]    @relation("ViewerContacts")
   reviews          Review[]         @relation("AuthoredReviews")
   bookingRequests  BookingRequest[] @relation("CustomerRequests")
+  instantBookings  InstantBooking[] @relation("CustomerInstantBookings")
 }
 
 model ProviderProfile {
@@ -57,6 +58,8 @@ model ProviderProfile {
   gender             String?
   experienceYears    Int                @default(0)
   expectedSalary     Int? // monthly, INR
+  instantAvailable   Boolean            @default(false) // offers daily / short-term bookings
+  dailyRate          Int? // per-day rate for instant bookings (provider's currency)
   bio                String?
   photoUrl           String? // profile photo (data URL for MVP)
   photoThumbUrl      String? // tiny thumbnail for list cards
@@ -74,10 +77,35 @@ model ProviderProfile {
   contactViews       ContactView[]
   reviews            Review[]
   bookingRequests    BookingRequest[]
+  instantBookings    InstantBooking[]
 
   @@index([city])
   @@index([pincode])
   @@index([verified])
+}
+
+// A date-range booking for daily / short-term ("instant") service.
+// Payment is handled offline for now (cash to the helper on arrival).
+model InstantBooking {
+  id           String          @id @default(cuid())
+  customerId   String
+  customer     User            @relation("CustomerInstantBookings", fields: [customerId], references: [id], onDelete: Cascade)
+  providerId   String
+  provider     ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  service      String
+  startDate    DateTime
+  endDate      DateTime
+  days         Int
+  ratePerDay   Int // snapshot of the provider's daily rate at booking time
+  totalAmount  Int // days * ratePerDay
+  message      String?
+  status       RequestStatus   @default(PENDING)
+  responseNote String? // provider's reason when declining
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([providerId])
+  @@index([customerId])
 }
 
 model BookingRequest {

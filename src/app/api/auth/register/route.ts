@@ -50,6 +50,8 @@ export async function POST(req: Request) {
                 gender: d.gender || null,
                 experienceYears: d.experienceYears ?? 0,
                 expectedSalary: d.expectedSalary ?? null,
+                instantAvailable: d.instantAvailable ?? false,
+                dailyRate: d.instantAvailable ? d.dailyRate ?? null : null,
                 bio: d.bio || null,
                 // Starts unverified — provider uploads ID, admin approves.
                 verified: false,

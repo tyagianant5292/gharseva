@@ -58,6 +58,8 @@ export async function GET(
       gender: p.gender,
       experienceYears: p.experienceYears,
       expectedSalary: p.expectedSalary,
+      instantAvailable: p.instantAvailable,
+      dailyRate: p.dailyRate,
       bio: p.bio,
       photoUrl: p.photoUrl,
       verificationStatus: p.verificationStatus,
